@@ -12,5 +12,5 @@ if ($conn->connect_error) {
 }
 
 // If the connection is successful, print this message (for testing purposes)
-echo "Connected successfully to the database!";
+//echo "Connected successfully to the database!";
 ?>
