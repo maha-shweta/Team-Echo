@@ -10,19 +10,20 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
 include('../db/db.php');
 
 // Statistics
-$tableCheck = $conn->query("SHOW TABLES LIKE 'users'");
+$tableCheck = $conn->query("SHOW TABLES LIKE 'management_user'");
 $totalUsers = $tableCheck->num_rows > 0 ? $conn->query("SELECT COUNT(*) as total FROM management_user")->fetch_assoc()['total'] : 0;
 $totalFeedback = $conn->query("SELECT COUNT(*) as total FROM feedback")->fetch_assoc()['total'];
 $resolvedFeedback = $conn->query("SELECT COUNT(*) as total FROM feedback WHERE is_resolved=1")->fetch_assoc()['total'];
 $pendingFeedback = $totalFeedback - $resolvedFeedback;
 
-// Feedback for table
+// Feedback table
 $sql = "SELECT f.feedback_id, f.feedback_text, f.submitted_at, c.category_name, f.is_resolved 
         FROM feedback f
-        JOIN category c ON f.category_id = c.category_id";
+        JOIN category c ON f.category_id = c.category_id
+        ORDER BY f.submitted_at DESC";
 $result = $conn->query($sql);
 
-// Category-wise feedback for charts
+// Category-wise chart data
 $catResult = $conn->query("SELECT c.category_name, COUNT(f.feedback_id) as count 
                            FROM category c 
                            LEFT JOIN feedback f ON c.category_id=f.category_id 
@@ -31,207 +32,256 @@ $categories = [];
 $catCounts = [];
 while ($row = $catResult->fetch_assoc()) {
     $categories[] = $row['category_name'];
-    $catCounts[] = $row['count'];
+    $catCounts[] = (int)$row['count'];
 }
+
+// Sentiment
+$sentimentResult = $conn->query("SELECT feedback_text FROM feedback");
+$sentiments = ['Positive'=>0, 'Neutral'=>0, 'Negative'=>0];
+
+while($row = $sentimentResult->fetch_assoc()){
+    $text = strtolower($row['feedback_text']);
+    if(strpos($text,'good')!==false || strpos($text,'excellent')!==false || strpos($text,'happy')!==false || strpos($text,'great')!==false || strpos($text,'love')!==false){
+        $sentiments['Positive']++;
+    } elseif(strpos($text,'bad')!==false || strpos($text,'poor')!==false || strpos($text,'angry')!==false || strpos($text,'hate')!==false || strpos($text,'terrible')!==false){
+        $sentiments['Negative']++;
+    } else {
+        $sentiments['Neutral']++;
+    }
+}
+
+$sentimentLabels = array_keys($sentiments);
+$sentimentCounts = array_values($sentiments);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Admin Dashboard</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
 <style>
-body { font-family: 'Inter', sans-serif; margin:0; background:#f6f8f9; }
+:root{
+    --bg:#f6f8f9;
+    --primary:#064c44;
+    --card:#ffffff;
+    --muted:#6b7280;
+    --accent-shadow: rgba(2,6,23,0.08);
+}
+*{box-sizing:border-box;}
+body { font-family: 'Inter', sans-serif; margin:0; background:var(--bg); color:#1f2937; }
+
 .header { background: linear-gradient(135deg,#0a5a52,#083e38); color:white; padding:20px 30px; display:flex; justify-content:space-between; align-items:center; }
-.header h1 { font-size:24px; margin:0; font-weight:700; }
-.header button { background:#ffffff22; border:1px solid #ffffff44; padding:8px 16px; border-radius:6px; font-size:14px; cursor:pointer; color:white; transition:0.3s; }
-.header button:hover { background:#ffffff33; }
+.header h1 { font-size:20px; margin:0; font-weight:700; letter-spacing:0.2px; }
+.header form button { background:#ffffff22; border:1px solid #ffffff33; padding:8px 14px; border-radius:8px; font-size:14px; cursor:pointer; color:white; transition:0.25s; }
+.header form button:hover { background:#ffffff33; transform:translateY(-1px); }
 
-/* Page Wrapper */
-.container { padding:25px; }
+.container { display:flex; flex-wrap:wrap; margin:0; }
 
-/* Main Button */
-.main-btn { background:#064c44; color:white; padding:10px 18px; display:inline-block; border-radius:6px; font-size:14px; text-decoration:none; font-weight:600; margin-bottom:20px; transition:0.3s; }
-.main-btn:hover { background:#043d36; }
-
-/* Statistics Cards */
-.stats { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:25px; justify-content: space-between; }
-.card { background:white; padding:20px; border-radius:10px; flex:1 1 180px; box-shadow:0 3px 8px rgba(0,0,0,0.1); text-align:center; }
-.card h3 { font-size:16px; margin:0; color:#064c44; font-weight:600; }
-.card p { font-size:20px; margin:8px 0 0; font-weight:700; }
-
-/* Charts */
-.chart-container {
-    display: flex;
-    gap: 30px;
-    justify-content: space-between;
-    flex-wrap: nowrap;   /* Prevent shrinking */
-    margin-top: 30px;
-    margin-left: 100px;
-    margin-right: 100px;
+/* LEFT COLUMN: Stats cards */
+.left-col {
+    flex: 0 0 220px;
+    padding: 20px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
 }
+.stats { display:flex; flex-direction:column; gap:12px; }
+.card { background:var(--card); padding:14px; border-radius:12px; box-shadow:0 8px 24px var(--accent-shadow); text-align:center; }
+.card .icon-box { width:38px; height:38px; border-radius:10px; background:var(--primary); color:white; display:inline-flex; align-items:center; justify-content:center; font-size:16px; margin-bottom:6px; }
+.card h3 { font-size:13px; margin:0 0 4px; color:var(--primary); font-weight:700; }
+.card p { font-size:18px; margin:0; font-weight:700; color:#111827; }
 
-.chart-container canvas {
-    width: 380px !important;   /* EXACT width like the image */
-    height: 380px !important;  /* EXACT height like the image */
-}
+/* RIGHT COLUMN */
+.right-col { flex:1; padding:20px; min-width:300px; }
+.filter-row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:12px; align-items:center; }
+.filter-row input, .filter-row select { padding:6px 10px; border-radius:6px; border:1px solid #e5e7eb; font-size:13px; }
+.filter-row button, .filter-row .main-btn { padding:6px 12px; font-size:13px; }
 
-/* Table */
-table { width:100%; border-collapse:collapse; background:white; border-radius:8px; overflow:hidden; box-shadow:0px 2px 6px rgba(0,0,0,0.1); font-size:14px; }
-th { background:#064c44; color:white; padding:12px; font-weight:600; text-align:left; }
-td { padding:10px; border-bottom:1px solid #eee; color:#333; }
-tr:hover td { background:#f3fdfa; }
-a.action-link { color:#064c44; font-weight:600; text-decoration:none; font-size:13px; }
-a.action-link:hover { text-decoration:underline; }
+.charts-row-right { display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
+.chart-card { flex:1 1 48%; min-width:200px; text-align:center; padding:14px; border-radius:12px; background:var(--card); box-shadow: 0 8px 24px var(--accent-shadow); }
+.chart-wrap { height:220px; display:flex; align-items:center; justify-content:center; }
 
-/* Filter */
-.filter { margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap; }
-.filter input, .filter select { padding:6px; border-radius:6px; border:1px solid #ccc; font-size:13px; }
+table { width:100%; border-collapse:collapse; background:var(--card); border-radius:8px; overflow:hidden; box-shadow:0 6px 18px rgba(2,6,23,0.04); }
+th { background:var(--primary); color:white; padding:10px; font-weight:600; text-align:left; font-size:13px; }
+td { padding:10px; border-bottom:1px solid #f3f4f6; vertical-align:middle; color:#374151; font-size:13px; }
+tr:hover td { background:#fbfefb; }
+.action-link { color:var(--primary); text-decoration:none; font-weight:600; }
+.action-link:hover { text-decoration:underline; }
 
-/* Toast */
-.toast { position: fixed; top:15px; right:15px; background:#064c44; color:white; padding:10px 14px; border-radius:6px; box-shadow:0 2px 6px rgba(0,0,0,0.2); display:none; z-index:1000; font-size:13px; }
-
-/* Responsive */
-@media (max-width:1024px) {
-    .chart-container canvas { max-width:300px; height:220px;}
-    .card { flex:1 1 140px; padding:16px; }
-}
-@media (max-width:768px) {
-    .chart-container { flex-direction: column; gap:15px; }
-    .stats { flex-direction: column; gap:12px; }
-    table th, table td { padding:10px; font-size:13px; }
-}
+@media (max-width:1000px){.left-col{position:relative; height:auto; flex:1 1 100%;}.right-col{flex:1 1 100%;}}
 </style>
 </head>
 <body>
 
-<!-- Header -->
 <div class="header">
-    <h1>Welcome, Admin <?php echo $_SESSION['name']; ?></h1>
+    <h1>Welcome, Admin <?php echo htmlspecialchars($_SESSION['name']); ?></h1>
     <form action="../logout.php" method="post">
-        <button type="submit">Logout</button>
+        <button type="submit"><i class="fa fa-sign-out-alt" style="margin-right:6px;"></i>Logout</button>
     </form>
 </div>
 
 <div class="container">
 
-    <a href="manage_users.php" class="main-btn">Manage Users & HR</a>
-
-    <!-- Statistics -->
-    <div class="stats">
-        <div class="card"><h3>Total Users</h3><p><?php echo $totalUsers; ?></p></div>
-        <div class="card"><h3>Total Feedback</h3><p><?php echo $totalFeedback; ?></p></div>
-        <div class="card"><h3>Pending</h3><p><?php echo $pendingFeedback; ?></p></div>
-        <div class="card"><h3>Resolved</h3><p><?php echo $resolvedFeedback; ?></p></div>
+    <!-- LEFT COLUMN: STATS CARDS -->
+    <div class="left-col">
+        <div class="stats">
+            <div class="card"><div class="icon-box"><i class="fas fa-users"></i></div><h3>Total Users</h3><p><?php echo (int)$totalUsers; ?></p></div>
+            <div class="card"><div class="icon-box"><i class="fas fa-comment-dots"></i></div><h3>Total Feedback</h3><p><?php echo (int)$totalFeedback; ?></p></div>
+            <div class="card"><div class="icon-box"><i class="fas fa-clock"></i></div><h3>Pending</h3><p><?php echo (int)$pendingFeedback; ?></p></div>
+            <div class="card"><div class="icon-box"><i class="fas fa-check-circle"></i></div><h3>Resolved</h3><p><?php echo (int)$resolvedFeedback; ?></p></div>
+            <div class="card"><div class="icon-box" style="background:#009688;"><i class="fas fa-smile"></i></div><h3>Positive</h3><p><?php echo (int)$sentiments['Positive']; ?></p></div>
+            <div class="card"><div class="icon-box" style="background:#9E9E9E;"><i class="fas fa-meh"></i></div><h3>Neutral</h3><p><?php echo (int)$sentiments['Neutral']; ?></p></div>
+            <div class="card"><div class="icon-box" style="background:#F44336;"><i class="fas fa-angry"></i></div><h3>Negative</h3><p><?php echo (int)$sentiments['Negative']; ?></p></div>
+        </div>
     </div>
 
-    <!-- Charts -->
-    <div class="chart-container">
-        <canvas id="barChart"></canvas>
-        <canvas id="pieChart"></canvas>
+    <!-- RIGHT COLUMN -->
+    <div class="right-col">
+        <!-- FILTERS -->
+        <div class="filter-row">
+            <input type="text" id="filterCategory" placeholder="Search by category">
+            <select id="filterResolved">
+                <option value="">All</option>
+                <option value="1">Resolved</option>
+                <option value="0">Pending</option>
+            </select>
+            <select id="filterSentiment">
+                <option value="">All Sentiments</option>
+                <option value="Positive">Positive</option>
+                <option value="Neutral">Neutral</option>
+                <option value="Negative">Negative</option>
+            </select>
+            <button class="main-btn" onclick="applyFilter(); return false;">Apply Filter</button>
+            <a href="manage_users.php" class="main-btn"><i class="fa fa-users" style="margin-right:4px;"></i>Manage Users & HR</a>
+        </div>
+
+        <!-- PIE CHARTS -->
+        <div class="charts-row-right">
+            <div class="chart-card">
+                <h4>Feedback by Category</h4>
+                <div class="chart-wrap">
+                    <canvas id="categoryDonut"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h4>Sentiment Analysis</h4>
+                <div class="chart-wrap">
+                    <canvas id="sentimentDonut"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- FEEDBACK TABLE -->
+        <table id="feedbackTable">
+            <tr>
+                <th>ID</th><th>Category</th><th>Feedback</th><th>Submitted</th><th>Resolved</th><th>Sentiment</th><th>Actions</th>
+            </tr>
+            <?php
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $text = strtolower($row['feedback_text']);
+                    if(strpos($text,'good')!==false || strpos($text,'excellent')!==false || strpos($text,'happy')!==false || strpos($text,'great')!==false || strpos($text,'love')!==false){
+                        $sentiment='Positive';
+                    } elseif(strpos($text,'bad')!==false || strpos($text,'poor')!==false || strpos($text,'angry')!==false || strpos($text,'hate')!==false || strpos($text,'terrible')!==false){
+                        $sentiment='Negative';
+                    } else {
+                        $sentiment='Neutral';
+                    }
+            ?>
+            <tr>
+                <td><?= (int)$row['feedback_id'] ?></td>
+                <td><?= htmlspecialchars($row['category_name']) ?></td>
+                <td><?= htmlspecialchars($row['feedback_text']) ?></td>
+                <td><?= htmlspecialchars($row['submitted_at']) ?></td>
+                <td><?= $row['is_resolved'] ? '✔ Yes' : '✖ No' ?></td>
+                <td><?= $sentiment ?></td>
+                <td>
+                    <a class="action-link" href="../feedback/resolve_feedback.php?id=<?= (int)$row['feedback_id'] ?>">Resolve</a> |
+                    <a class="action-link" href="../feedback/delete_feedback.php?id=<?= (int)$row['feedback_id'] ?>" onclick="return confirm('Are you sure?');">Delete</a>
+                </td>
+            </tr>
+            <?php } } else { echo "<tr><td colspan='7'>No feedback found</td></tr>"; } ?>
+        </table>
     </div>
 
-    <!-- Filter -->
-    <div class="filter">
-        <input type="text" id="filterCategory" placeholder="Search by category">
-        <select id="filterResolved">
-            <option value="">All</option>
-            <option value="1">Resolved</option>
-            <option value="0">Pending</option>
-        </select>
-        <button onclick="applyFilter()">Apply Filter</button>
-    </div>
-
-    <!-- Feedback Table -->
-    <h2>Feedback List</h2>
-    <table id="feedbackTable">
-        <tr>
-            <th>ID</th><th>Category</th><th>Feedback</th><th>Submitted At</th><th>Resolved</th><th>Actions</th>
-        </tr>
-        <?php if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) { ?>
-                <tr>
-                    <td><?php echo $row['feedback_id']; ?></td>
-                    <td><?php echo $row['category_name']; ?></td>
-                    <td><?php echo $row['feedback_text']; ?></td>
-                    <td><?php echo $row['submitted_at']; ?></td>
-                    <td><?php echo $row['is_resolved'] ? '✔ Yes' : '✖ No'; ?></td>
-                    <td>
-                        <a class="action-link" href="../feedback/resolve_feedback.php?id=<?php echo $row['feedback_id']; ?>">Resolve</a> |
-                        <a class="action-link" href="../feedback/delete_feedback.php?id=<?php echo $row['feedback_id']; ?>" onclick="return confirm('Are you sure you want to delete this feedback?');">Delete</a>
-                    </td>
-                </tr>
-        <?php } } else { echo "<tr><td colspan='6'>No feedback available!</td></tr>"; } ?>
-    </table>
 </div>
 
-<div class="toast" id="toast"></div>
-
 <script>
-// Charts
-const categories = <?php echo json_encode($categories); ?>;
-const counts = <?php echo json_encode($catCounts); ?>;
+const categoryLabels = <?php echo json_encode($categories, JSON_HEX_TAG); ?>;
+const categoryData = <?php echo json_encode($catCounts, JSON_HEX_TAG); ?>;
+const sentimentLabels = <?php echo json_encode($sentimentLabels, JSON_HEX_TAG); ?>;
+const sentimentData = <?php echo json_encode($sentimentCounts, JSON_HEX_TAG); ?>;
 
-function generateGradients(ctx, count) {
-    const gradients = [];
-    const baseColors = [
-        ['#FF6384','#FF99A4'],['#36A2EB','#69B8FF'],['#FFCE56','#FFE080'],
-        ['#4BC0C0','#80DADA'],['#9966FF','#B499FF'],['#FF9F40','#FFB777'],
-        ['#8BC34A','#A9D272'],['#E91E63','#F0638A'],['#00BCD4','#33CDD7'],['#FFC107','#FFD454']
-    ];
-    for(let i=0;i<count;i++){
-        const grad = ctx.createLinearGradient(0,0,0,400);
-        const c = baseColors[i % baseColors.length];
-        grad.addColorStop(0,c[0]);
-        grad.addColorStop(1,c[1]);
-        gradients.push(grad);
+const categoryColors = ["#009688","#673AB7","#FFC107","#3F51B5","#FF5722","#8BC34A","#00BCD4"];
+const sentimentColors = ["#009688","#9E9E9E","#F44336"];
+
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.plugins.tooltip.boxPadding = 8;
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+const centerTextPlugin = {
+    id: 'centerTextPlugin',
+    afterDraw(chart, args, options) {
+        const ctx = chart.ctx;
+        const width = chart.width;
+        const height = chart.height;
+        ctx.save();
+        const dataset = chart.data.datasets[0];
+        const total = dataset.data.reduce((a,b)=>a+b,0);
+        ctx.font = "700 22px Inter";
+        ctx.fillStyle = "#111827";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(total, width/2, height/2 - 6);
+        ctx.font = "500 13px Inter";
+        ctx.fillStyle = "#6b7280";
+        ctx.fillText(options.label || "Total", width/2, height/2 + 18);
+        ctx.restore();
     }
-    return gradients;
-}
+};
 
-// Bar Chart
-const barCtx = document.getElementById('barChart').getContext('2d');
-new Chart(barCtx,{
-    type:'bar',
-    data:{ labels:categories, datasets:[{ label:'Feedback Count', data:counts, backgroundColor:generateGradients(barCtx,categories.length) }] },
-    options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true},x:{ticks:{font:{size:12}}}}, animation:{duration:1000} }
+const catCtx = document.getElementById('categoryDonut').getContext('2d');
+new Chart(catCtx, {
+    type:'doughnut',
+    data:{labels:categoryLabels,datasets:[{data:categoryData,backgroundColor:categoryColors,borderColor:'#fff',borderWidth:2,hoverOffset:12}]},
+    options:{cutout:'68%',responsive:true,maintainAspectRatio:false,plugins:{centerTextPlugin:{label:'Categories'},legend:{display:true,position:'bottom',labels:{padding:12,boxWidth:12,font:{size:13,weight:'600'}}},datalabels:{color:'#fff',formatter:(value)=>{const total = categoryData.reduce((a,b)=>a+b,1); return Math.round((value/total)*100)+'%';},font:{weight:'700',size:13}},tooltip:{callbacks:{label:(context)=>{const label=context.label||'';const value=context.parsed||0;const total=categoryData.reduce((a,b)=>a+b,1);const percent=((value/total)*100).toFixed(1);return `${label}: ${value} (${percent}%)`;}}}},layout:{padding:8}},
+    plugins:[ChartDataLabels,centerTextPlugin]
 });
 
-// Pie Chart
-const pieCtx = document.getElementById('pieChart').getContext('2d');
-new Chart(pieCtx,{
-    type:'pie',
-    data:{ labels:categories, datasets:[{ data:counts, backgroundColor:[
-        '#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF','#FF9F40','#8BC34A','#E91E63','#00BCD4','#FFC107'
-    ].slice(0,categories.length) }]},
-    options:{ responsive:true, animation:{animateRotate:true,animateScale:true,duration:1000} }
+const senCtx = document.getElementById('sentimentDonut').getContext('2d');
+new Chart(senCtx,{
+    type:'doughnut',
+    data:{labels:sentimentLabels,datasets:[{data:sentimentData,backgroundColor:sentimentColors,borderColor:'#fff',borderWidth:2,hoverOffset:12}]},
+    options:{cutout:'70%',responsive:true,maintainAspectRatio:false,plugins:{centerTextPlugin:{label:'Sentiment'},legend:{display:true,position:'bottom',labels:{padding:12,boxWidth:12,font:{size:13,weight:'600'}}},datalabels:{color:'#fff',formatter:(value)=>{const total = sentimentData.reduce((a,b)=>a+b,1);return Math.round((value/total)*100)+'%';},font:{weight:'700',size:13}},tooltip:{callbacks:{label:(context)=>{const label=context.label||'';const value=context.parsed||0;const total=sentimentData.reduce((a,b)=>a+b,1);const percent=((value/total)*100).toFixed(1);return `${label}: ${value} (${percent}%)`;}}}},layout:{padding:8}},
+    plugins:[ChartDataLabels,centerTextPlugin]
 });
 
-// Filter Table
+// Filter
 function applyFilter(){
-    const category = document.getElementById('filterCategory').value.toLowerCase();
-    const resolved = document.getElementById('filterResolved').value;
-    const rows = document.querySelectorAll('#feedbackTable tr');
-    rows.forEach((row,index)=>{
-        if(index===0) return;
-        const catText = row.cells[1].innerText.toLowerCase();
-        const resText = row.cells[4].innerText.includes('✔') ? '1':'0';
-        row.style.display = ( (category === '' || catText.includes(category)) && (resolved === '' || resText === resolved) ) ? '' : 'none';
-    });
-}
+    const cat = document.getElementById("filterCategory").value.toLowerCase();
+    const res = document.getElementById("filterResolved").value;
+    const sen = document.getElementById("filterSentiment").value;
 
-// Toast Message Example
-function showToast(msg){
-    const toast = document.getElementById('toast');
-    toast.innerText = msg;
-    toast.style.display='block';
-    setTimeout(()=>{toast.style.display='none';},3000);
+    document.querySelectorAll("#feedbackTable tr").forEach((r,i)=>{
+        if(i===0) return;
+        const c = r.cells[1].innerText.toLowerCase();
+        const rs = r.cells[4].innerText.includes("✔") ? "1" : "0";
+        const st = r.cells[5].innerText;
+        r.style.display = (cat=="" || c.includes(cat)) && (res=="" || rs==res) && (sen=="" || st==sen) ? "" : "none";
+    });
 }
 </script>
 
 </body>
 </html>
+
 <?php $conn->close(); ?>
