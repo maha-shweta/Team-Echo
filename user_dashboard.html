@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Mifta</title>
+    <link rel="stylesheet" href="user_dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="main-layout">
+        
+        <aside class="sidebar">
+            <div class="system-title">Feedback System</div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">Dashboard</a>
+                <a href="submit_feedback.html" class="nav-item">Submit Feedback</a>
+                <a href="login.html" class="nav-item">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="content-area">
+            
+            <header class="top-header">
+                <div class="welcome-text">Welcome, User</div>
+                <button class="logout-btn">Logout</button>
+            </header>
+
+            <div class="dashboard-content">
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="label">Total Feedback</div>
+                        <div class="value">3</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Resolved</div>
+                        <div class="value resolved">1</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Pending</div>
+                        <div class="value pending">2</div>
+                    </div>
+                </div>
+
+                
+
+                <h3 class="list-title">Anonymous Feedback List</h3>
+
+                <div class="feedback-table-container">
+                    <table class="feedback-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Category</th>
+                                <th>Feedback</th>
+                                <th>Submitted At</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>3</td>
+                                <td>Student Services</td>
+                                <td>The cafeteria food quality has improved, but the seating arrangement is limited</td>
+                                <td>2025-12-06 10:03:54</td>
+                                <td class="status-pending"><span class="icon">◷</span> Pending</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>Teaching Quality</td>
+                                <td>good</td>
+                                <td>2025-12-06 09:59:53</td>
+                                <td class="status-pending"><span class="icon">◷</span> Pending</td>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>Campus Facilities</td>
+                                <td>So bad</td>
+                                <td>2025-12-06 09:38:28</td>
+                                <td class="status-resolved"><span class="icon">✔</span> Resolved</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

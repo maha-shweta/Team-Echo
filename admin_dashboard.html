@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard System</title>
+<link rel="stylesheet" href="admin_dashboard.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+ <div class="main-layout">
+        
+        <aside class="sidebar">
+            <div class="system-title">Feedback System</div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">Dashboard</a>
+                <a href="manage_feedback.html" class="nav-item">Manage Feedback</a>
+                <a href="manage_users.html" class="nav-item">Manage User</a>
+                <a href="reports_page.html" class="nav-item">Reports</a>
+                <a href="login.html" class="nav-item">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="content-area">
+            
+            <header class="top-header">
+                <div class="welcome-text">Welcome, Admin</div>
+                <button class="logout-btn">Logout</button>
+            </header>
+
+        <!-- MAIN CONTENT -->
+        <div class="dashboard-content">
+
+            <!-- STATS GRID -->
+            <div class="stats-grid">
+
+               
+
+                <div class="stat-card">
+                    <div class="icon">👥</div>
+                    <h3>Total Users</h3>
+                    <p>3</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="icon">📊</div>
+                    <h3>33%</h3>
+                    <p>3</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="icon">💬</div>
+                    <h3>Total Feedback</h3>
+                    <p>3</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="icon">💬</div>
+                    <h3>Total Feedback</h3>
+                    <p>2</p>
+                </div>
+
+               
+
+               
+
+                <div class="stat-card">
+                    <div class="icon">⏳</div>
+                    <h3>Pending</h3>
+                    <p>1</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="icon">✔️</div>
+                    <h3>Resolved</h3>
+                    <p>1</p>
+                </div>
+
+            </div>
+
+            <!-- CHART AREA -->
+            <br>
+            <br>
+
+            <div class="chart-card">
+            <h3>Category Chart</h3>
+            <canvas id="categoryChart"></canvas>
+           </div>
+
+           <div class="chart-card">
+           <h3>Sentiment Chart</h3>
+           <canvas id="sentimentChart"></canvas>
+          </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+<script>
+    // CATEGORY CHART (Static Values)
+    const categoryCtx = document.getElementById('categoryChart');
+
+    new Chart(categoryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Campus Facilities', 'Teaching Quality', 'Student Services', 'Campus Safety'],
+            datasets: [{
+                data: [35, 25, 20, 20],  // Static
+                backgroundColor: ['#0b5740', '#f39c12', '#3498db', '#9b59b6']
+            }]
+        }
+    });
+
+    // SENTIMENT CHART (Static Values)
+    const sentimentCtx = document.getElementById('sentimentChart');
+
+    new Chart(sentimentCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Positive', 'Neutral', 'Negative'],
+            datasets: [{
+                data: [52, 28, 20],  // Static
+                backgroundColor: ['#0b5740', '#f39c12', '#e74c3c']
+            }]
+        }
+    });
+</script>
+
+
+</body>
+</html>

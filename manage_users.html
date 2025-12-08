@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users - Admin</title>
+    <link rel="stylesheet" href="mange_users.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="main-layout">
+        
+        <aside class="sidebar">
+            <div class="system-title">Feedback System</div>
+            <nav class="nav-menu">
+                <a href="admin_dashboard.html" class="nav-item">Dashboard</a>
+                <a href="manage_feedback.html" class="nav-item">Manage Feedback</a>
+                <a href="#" class="nav-item active">Manage Users</a> 
+                <a href="reports_page.html" class="nav-item">Reports</a>
+                <a href="login.html" class="nav-item">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="content-area">
+            
+            <header class="top-header">
+                <div class="welcome-text">Manage All System Users</div>
+                <button class="logout-btn">Logout</button>
+            </header>
+
+            <div class="dashboard-content">
+
+                <h3 class="list-title">User Accounts</h3>
+
+                <div class="user-controls">
+                    <input type="text" placeholder="Search by Name or Email..." class="search-input">
+                    <select class="filter-select">
+                        <option value="all">Role: All</option>
+                        <option value="user">Role: User</option>
+                        <option value="admin">Role: Admin</option>
+                        <option value="admin">Role: HR</option>
+                    </select>
+                    <button class="add-user-btn submit-form-btn"> + Add New User</button>
+                </div>
+                
+                <div class="feedback-table-container">
+                    <table class="feedback-table user-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Last Login</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>101</td>
+                                <td>Admin User</td>
+                                <td>admin@institution.edu</td>
+                                <td class="role-admin">Admin</td>
+                                <td>2025-12-07 10:55:00</td>
+                                <td>
+                                    <button class="action-btn edit-btn">Edit</button>
+                                    <button class="action-btn delete-btn">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>102</td>
+                                <td>Student A.</td>
+                                <td>studentA@email.com</td>
+                                <td class="role-user">User</td>
+                                <td>2025-12-06 14:15:22</td>
+                                <td>
+                                    <button class="action-btn edit-btn">Edit</button>
+                                    <button class="action-btn delete-btn">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>103</td>
+                                <td>Faculty B.</td>
+                                <td>facultyB@email.com</td>
+                                <td class="role-user">User</td>
+                                <td>2025-11-20 09:00:00</td>
+                                <td>
+                                    <button class="action-btn edit-btn">Edit</button>
+                                    <button class="action-btn delete-btn">Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

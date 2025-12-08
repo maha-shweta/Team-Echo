@@ -1,0 +1,177 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f5f7f8;
+}
+
+/* --- Layout Structure --- */
+.main-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Primary Dark Green/Teal Color (EXACT MATCH from image header/buttons) */
+:root {
+    --primary-green-dark: #0c4f3b; 
+    --accent-green-light: #32b25e; /* Exact match for Logout/Resolved */
+    --pending-color: #f39c12; /* Amber for pending */
+}
+
+/* --- Sidebar Styling --- */
+.sidebar {
+    width: 240px;
+    background-color: #ffffff; 
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    padding: 20px 0;
+    flex-shrink: 0;
+}
+
+.system-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-green-dark);
+    padding: 0 20px 30px 20px;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-item {
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #555;
+    font-size: 15px;
+    transition: background-color 0.2s, color 0.2s;
+    border-left: 5px solid transparent;
+}
+
+.nav-item.active {
+    background-color: #f0f8ff; 
+    color: var(--primary-green-dark);
+    font-weight: 600;
+    border-left-color: var(--primary-green-dark); 
+}
+
+.nav-item:hover:not(.active) {
+    background-color: #f9f9f9;
+}
+
+/* --- Main Content Area --- */
+.content-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* **TOP HEADER BAR: Uses the dark contrast color** */
+.top-header {
+    background-color: var(--primary-green-dark); /* Very Dark Teal */
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.welcome-text {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* **LOGOUT BUTTON: Uses the light accent color** */
+.logout-btn {
+    background-color: var(--primary-green-dark);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.5); /* subtle border from screenshot */
+    padding: 8px 22px; /* same spacing in image */
+    border-radius: 25px; /* pill shape */
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.10); /* soft shadow */
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.logout-btn:hover {
+    background-color: #085826; /* dark hover */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* bigger shadow */
+}
+
+
+
+.dashboard-content {
+    padding: 30px;
+    max-width: 1200px;
+    width: 100%;
+}
+
+
+
+/* CONTENT */
+.content {
+    flex: 1;
+    padding: 25px;
+}
+
+.section-title {
+    margin: 20px 0;
+    font-size: 18px;
+}
+
+/* STATS GRID */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 16px;
+}
+
+.stat-card {
+    background: #fff;
+    padding: 18px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.stat-card .icon {
+    font-size: 25px;
+    margin-bottom: 6px;
+}
+
+.stat-card h3 {
+    font-size: 16px;
+    margin-bottom: 4px;
+    color: #333;
+}
+
+.stat-card p {
+    font-size: 22px;
+    font-weight: bold;
+    color: #0b5740;
+}
+
+/* CHART CARDS */
+.chart-card {
+    background: #fff;
+    padding: 20px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+}
+
+.chart-card img {
+    width: 100%;
+    height: 20px;
+    background: #eee;
+}
+.chart-card canvas {
+    max-width: 200px;
+    margin: 0 auto;
+}
+

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="admin_dashboard.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="main-layout">
+        
+        <aside class="sidebar">
+            <div class="system-title">Feedback System</div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active">Dashboard</a>
+                <a href="manage_feedback.html" class="nav-item">Manage Feedback</a>
+                <a href="#" class="nav-item">Manage Users</a>
+                <a href="#" class="nav-item">Reports</a>
+                <a href="#" class="nav-item">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="content-area">
+            
+            <header class="top-header">
+                <div class="welcome-text">Welcome, Admin</div>
+                <button class="logout-btn">Logout</button>
+            </header>
+
+            <div class="dashboard-content">
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="label">Total Users</div>
+                        <div class="value">45</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Total Feedback</div>
+                        <div class="value">23</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Pending Feedback</div>
+                        <div class="value pending">12</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Feedback/User</div>
+                        <div class="value">0.51</div>
+                    </div>
+                </div>
+
+                <h3 class="list-title">All Pending Feedback</h3>
+
+                <div class="feedback-table-container">
+                    <table class="feedback-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Category</th>
+                                <th>Feedback Summary</th>
+                                <th>User ID</th>
+                                <th>Submitted At</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>23</td>
+                                <td>Campus Facilities</td>
+                                <td>The Wi-Fi in the North Wing is constantly dropping out.</td>
+                                <td>102</td>
+                                <td>2025-12-07 09:30:15</td>
+                                <td class="status-pending"><span class="icon">◷</span> Pending</td>
+                                <td><button class="action-btn resolve-btn">Resolve</button></td>
+                            </tr>
+                            <tr>
+                                <td>22</td>
+                                <td>Teaching Quality</td>
+                                <td>Need more review sessions for Calculus 101 before the final.</td>
+                                <td>105</td>
+                                <td>2025-12-07 08:45:00</td>
+                                <td class="status-pending"><span class="icon">◷</span> Pending</td>
+                                <td><button class="action-btn resolve-btn">Resolve</button></td>
+                            </tr>
+                            <tr>
+                                <td>21</td>
+                                <td>Student Services</td>
+                                <td>The registration website was extremely slow on Monday morning.</td>
+                                <td>108</td>
+                                <td>2025-12-06 15:10:20</td>
+                                <td class="status-resolved"><span class="icon">✔</span> Resolved</td>
+                                <td><button class="action-btn resolved-btn" disabled>Resolved</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

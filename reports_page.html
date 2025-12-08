@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Admin</title>
+    <link rel="stylesheet" href="reports_page.css"> 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="main-layout">
+        
+        <aside class="sidebar">
+            <div class="system-title">Feedback System</div>
+            <nav class="nav-menu">
+                <a href="admin_dashboard.html" class="nav-item">Dashboard</a>
+                <a href="manage_feedback.html" class="nav-item">Manage Feedback</a>
+                <a href="manage_users.html" class="nav-item">Manage Users</a>
+                <a href="#" class="nav-item active">Reports</a>
+                <a href="login.html" class="nav-item">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="content-area">
+            
+            <header class="top-header">
+                <div class="welcome-text">Generate and View System Reports</div>
+                <button class="logout-btn">Logout</button>
+            </header>
+
+            <div class="dashboard-content">
+
+                
+
+                
+                
+                <div class="report-container">
+                    
+                    <div class="stats-grid report-stats">
+                        <div class="stat-card">
+                            <div class="label">Total Submissions</div>
+                            <div class="value">450</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Avg. Resolution Time</div>
+                            <div class="value resolved">2.5 Days</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Highest Volume Category</div>
+                            <div class="value pending">Facilities</div>
+                        </div>
+                    </div>
+
+                    
+                   
+                   <br><br>
+
+                    
+
+                <!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="chart-section">
+    <h3 class="chart-title">Feedback Volume Trend (Total Submissions by Month)</h3>
+
+    <div class="chart-box">
+        <canvas id="donutChart"></canvas>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById("donutChart");
+
+    new Chart(ctx, {
+        type: "doughnut",
+        data: {
+            labels: [
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+            ],
+            datasets: [{
+                data: [30, 25, 20, 25, 20, 10, 4, 3, 2, 4, 12, 22],   // Static values
+                backgroundColor: [
+                    "#0B6B41",  // green
+                    "#F4A100",  // orange
+                    "#1E90FF",  // blue
+                    "#8A2BE2",   // purple
+                    "#0B6B41",  // green
+                    "#F4A100",  // orange
+                    "#1E90FF",  // blue
+                    "#8A2BE2" ,  // purple
+                    "#0B6B41",  // green
+                    "#F4A100",  // orange
+                    "#1E90FF",  // blue
+                    "#8A2BE2"   // purple
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: "right",
+                    labels: {
+                        boxWidth: 20,
+                        padding: 15
+                    }
+                }
+            },
+            cutout: "55%"
+        }
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+                    <div class="feedback-table-container">
+                        <h4 class="list-title" style="margin-top: 0; padding: 10px 15px; background: #eee; border-radius: 4px 4px 0 0;">Top 10 Most Critical Feedback</h4>
+                        <table class="feedback-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Feedback ID</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Resolution Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>401</td>
+                                    <td>Campus Facilities</td>
+                                    <td class="status-pending">Pending</td>
+                                    <td>N/A</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>350</td>
+                                    <td>Student Services</td>
+                                    <td class="status-resolved">Resolved</td>
+                                    <td>1 Day</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

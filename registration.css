@@ -1,0 +1,210 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body, html {
+    height: 100%;
+    width: 100%;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* --- LEFT SECTION --- */
+.left-section {
+    flex: 1;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Vertically centers the form */
+    padding: 40px;
+}
+
+.form-wrapper {
+    width: 100%;
+    max-width: 480px;
+}
+
+.title-text {
+    color: #000;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.sub-text {
+    color: #888;
+    font-size: 14px;
+    margin-bottom: 35px;
+}
+
+/* Input Group Styling */
+.input-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+/* Standard Input Styling */
+input, select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    color: #333;
+}
+
+input:focus, select:focus {
+    border-color: #0d4d40;
+}
+
+/* Specific Background Classes based on image */
+.input-white {
+    background-color: #ffffff;
+}
+
+.input-blue {
+    background-color: #eff4f9; /* Light blueish grey matched from image */
+}
+
+/* Dropdown arrow fix */
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px top 50%;
+    background-size: 10px auto;
+    cursor: pointer;
+}
+
+/* Button Styling */
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #0d4d40; /* Dark Green */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.2s;
+}
+
+.submit-btn:hover {
+    background-color: #08382e;
+}
+
+/* Footer Link */
+.form-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-footer a {
+    color: #0d4d40;
+    text-decoration: underline;
+    font-weight: 700;
+}
+
+/* --- RIGHT SECTION --- */
+.right-section {
+    flex: 1;
+    background-color: #0d4d40; /* Matched Dark Green */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+}
+
+.content-wrapper {
+    max-width: 500px;
+}
+
+.right-section h1 {
+    color: white;
+    font-size: 36px;
+    line-height: 1.2;
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+.right-section p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* --- Responsive Layout for Mobile --- */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .right-section {
+        display: none; /* Hide image section on small screens */
+    }
+    
+    .left-section {
+        padding: 20px;
+    }
+}
+
+
+
+
+
+/* --- Styles for Password Field Consistency --- */
+
+.password-group {
+    /* Ensures the wrapper and count are positioned correctly */
+    position: relative;
+}
+
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-group .input-blue {
+    /* Use padding to ensure the 'Show' button doesn't overlap text */
+    padding-right: 60px;
+}
+
+.show-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: #0d4d40; /* Match the dark green color */
+    cursor: pointer;
+    font-weight: 600;
+    z-index: 15; /* Ensure it is above the input */
+}
+
+.char-count {
+    text-align: right;
+    font-size: 11px;
+    color: #999;
+    margin-top: 4px;
+}

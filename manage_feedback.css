@@ -1,0 +1,416 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: #f7f7f7; /* Light background for the dashboard area */
+}
+
+/* --- Color Variables (Consistent Theme) --- */
+:root {
+    /* Exact match from image header/buttons */
+    --primary-green-dark: #0c4f3b; 
+    /* Exact match for Logout/Resolved */
+    --accent-green-light: #32b25e; 
+    /* Amber for pending */
+    --pending-color: #f39c12; 
+}
+
+/* --- Layout Structure (Sidebar + Main Content) --- */
+.main-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- Sidebar Styling --- */
+.sidebar {
+    width: 240px;
+    background-color: #ffffff; 
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    padding: 20px 0;
+    flex-shrink: 0;
+}
+
+.system-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-green-dark);
+    padding: 0 20px 30px 20px;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-item {
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #555;
+    font-size: 15px;
+    transition: background-color 0.2s, color 0.2s;
+    border-left: 5px solid transparent;
+}
+
+.nav-item.active {
+    background-color: #f0f8ff; 
+    color: var(--primary-green-dark);
+    font-weight: 600;
+    border-left-color: var(--primary-green-dark); 
+}
+
+.nav-item:hover:not(.active) {
+    background-color: #f9f9f9;
+}
+
+/* --- Main Content Area --- */
+.content-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* TOP HEADER BAR */
+.top-header {
+    background-color: var(--primary-green-dark); 
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.welcome-text {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.logout-btn {
+    background-color: var(--primary-green-dark);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.5); /* subtle border from screenshot */
+    padding: 8px 22px; /* same spacing in image */
+    border-radius: 25px; /* pill shape */
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.10); /* soft shadow */
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.logout-btn:hover {
+    background-color: #085826; /* dark hover */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* bigger shadow */
+}
+
+.dashboard-content {
+    padding: 30px;
+    width: 100%;
+}
+
+/* --- Stats Cards (Admin and User dashboards) --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background-color: white;
+    padding: 25px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.label {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.value {
+    font-size: 36px;
+    font-weight: 700;
+    color: #333;
+}
+
+.resolved {
+    color: var(--accent-green-light); 
+}
+
+.pending {
+    color: var(--pending-color); 
+}
+
+/* --- Submit Feedback Button (on User Dashboard) --- */
+.submit-feedback-btn {
+    background-color: var(--primary-green-dark); 
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px; /* Matches the rounded pill shape */
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 40px;
+    transition: background-color 0.2s;
+}
+
+.submit-feedback-btn:hover {
+    background-color: #08382e;
+}
+
+
+/* --- Feedback List/Table Styles --- */
+.list-title {
+    font-size: 20px;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.feedback-table-container {
+    background-color: white;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    margin-top: 30px;
+}
+
+.feedback-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.feedback-table th {
+    background-color: var(--primary-green-dark); 
+    color: white; 
+    text-align: left;
+    padding: 12px 15px;
+    font-weight: 600;
+}
+
+.feedback-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #eee;
+    color: #555;
+}
+
+.feedback-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Status Styling */
+.status-resolved {
+    color: var(--accent-green-light);
+    font-weight: 600;
+}
+
+.status-pending {
+    color: var(--pending-color);
+    font-weight: 600;
+}
+
+.status-resolved .icon, .status-pending .icon {
+    margin-right: 5px;
+}
+
+/* --- Admin Specific Table Action Buttons --- */
+.action-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+
+.resolve-btn {
+    background-color: var(--accent-green-light); /* Vibrant Green */
+    color: white;
+}
+
+.resolve-btn:hover {
+    opacity: 0.8;
+}
+
+.resolved-btn {
+    background-color: #f0f0f0;
+    color: #666;
+    cursor: default;
+}
+
+/* --- SUBMIT FEEDBACK FORM CONTAINER --- */
+.feedback-form-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    max-width: 700px; 
+    margin: 0 auto;
+}
+
+.form-title {
+    font-size: 18px;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 25px;
+    text-align: center; 
+}
+
+.form-group {
+    margin-bottom: 30px;
+    position: relative;
+}
+
+/* --- Input Field Styles (General) --- */
+.input-field {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    background-color: white;
+    color: #333;
+    transition: border-color 0.2s;
+    
+    /* REMOVED 'appearance: none;' TO ALLOW NATIVE DROPDOWN ARROW TO SHOW */
+}
+
+.input-field:focus {
+    border-color: var(--primary-green-dark);
+}
+
+/* Floating Label Positioning */
+.floating-label label {
+    position: absolute;
+    top: -10px; 
+    left: 10px;
+    background-color: white;
+    padding: 0 5px;
+    font-size: 13px;
+    color: #555;
+    font-weight: 500;
+    z-index: 10;
+}
+
+/* Textarea Specifics */
+.textarea-group {
+    margin-bottom: 20px; 
+}
+
+textarea.input-field {
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.5;
+    padding-bottom: 25px;
+}
+
+.char-count {
+    position: absolute;
+    bottom: 5px;
+    right: 10px;
+    font-size: 12px;
+    color: #999;
+    z-index: 10;
+}
+
+/* Specific styling for the Submit button on the form page */
+.submit-form-btn {
+    width: 100%; 
+    padding: 14px;
+    font-size: 16px;
+    /* Inherits color/radius from .submit-feedback-btn class */
+}
+
+/* --- Manage Feedback Page Controls --- */
+
+.filter-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.search-input, .filter-select {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.search-input {
+    flex-grow: 1; 
+}
+
+.search-input:focus, .filter-select:focus {
+    border-color: var(--primary-green-dark);
+}
+
+.refresh-btn {
+    background-color: #ccc;
+    color: #333;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.refresh-btn:hover {
+    background-color: #bbb;
+}
+
+
+/* --- Responsive adjustments --- */
+@media (max-width: 900px) {
+    .main-layout {
+        flex-direction: column;
+    }
+    .sidebar {
+        width: 100%;
+        height: auto;
+        padding: 10px 0;
+    }
+    .system-title {
+        display: none; 
+    }
+    .nav-menu {
+        flex-direction: row;
+        justify-content: space-around;
+    }
+    .top-header {
+        display: none; 
+    }
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .filter-controls {
+        flex-direction: column;
+    }
+    .refresh-btn, .filter-select {
+        width: 100%;
+    }
+    .feedback-table th:nth-child(3), 
+    .feedback-table td:nth-child(3) {
+        display: none; /* Hide summary column on smaller screens */
+    }
+}

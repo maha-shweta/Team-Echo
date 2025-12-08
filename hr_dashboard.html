@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Dashboard</title>
+    <link rel="stylesheet" href="hr_dashboard.css"> 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="main-layout">
+        
+        <aside class="sidebar">
+            <div class="system-title">Feedback System</div>
+            <nav class="nav-menu">
+                
+                <a href="#" class="nav-item active">Dashboard</a>
+                <a href="login.html" class="nav-item">Logout</a>
+            </nav>
+        </aside>
+
+        <main class="content-area">
+            
+            <header class="top-header">
+                <div class="welcome-text">Welcome, HR Manager (Placeholder Name)</div>
+                <button class="logout-btn">Logout</button>
+            </header>
+
+            <div class="dashboard-content">
+                
+                <div class="stats-grid" style="margin-bottom: 30px;">
+                    <div class="stat-card">
+                        <div class="label">Staff Feedback Volume</div>
+                        <div class="value">5</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Avg. Resolution Time (HR)</div>
+                        <div class="value resolved">1.2 Days</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">Pending Staff Issues</div>
+                        <div class="value pending">2</div>
+                    </div>
+                </div>
+
+                <h3 class="list-title">Assigned Feedback List (HR)</h3>
+                
+                <div class="feedback-table-container">
+                    <table class="feedback-table">
+                        <thead>
+                            <tr>
+                                <th>Feedback ID</th>
+                                <th>Category</th>
+                                <th>Feedback Preview</th>
+                                <th>Submitted At</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>105</td>
+                                <td>Teaching Quality</td>
+                                <td>The course outline needs updating...</td>
+                                <td>2025-12-07 14:00:00</td>
+                                <td class="status-resolved">Resolved</td>
+                                <td>
+                                    <button class="action-btn resolved-btn">Resolved</button>
+                                    <button class="action-btn delete-btn">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>108</td>
+                                <td>Student Services</td>
+                                <td>Issue with staff availability during lunch.</td>
+                                <td>2025-12-07 09:15:00</td>
+                                <td class="status-pending">Pending</td>
+                                <td>
+                                    <button class="action-btn resolve-btn">Mark as Resolved</button>
+                                    <button class="action-btn delete-btn">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>112</td>
+                                <td>Campus Facilities</td>
+                                <td>The maintenance team was slow to respond.</td>
+                                <td>2025-12-06 18:30:00</td>
+                                <td class="status-pending">Pending</td>
+                                <td>
+                                    <button class="action-btn resolve-btn">Mark as Resolved</button>
+                                    <button class="action-btn delete-btn">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>099</td>
+                                <td>Teaching Quality</td>
+                                <td>Professor X handled the issue well.</td>
+                                <td>2025-12-05 10:00:00</td>
+                                <td class="status-resolved">Resolved</td>
+                                <td>
+                                    <button class="action-btn resolved-btn">Resolved</button>
+                                    <button class="action-btn delete-btn">Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
