@@ -1,7 +1,7 @@
 # Team-Echo
 Anonymous Feedback System
 
-### Mahashweta
+#### (Mahashweta)
 
 ## User Authentication and Authorization
 - User login system to ensure only authorized users can access the platform.
