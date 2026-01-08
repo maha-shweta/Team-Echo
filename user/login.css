@@ -1,0 +1,191 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body, html {
+    height: 100%;
+    width: 100%;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* --- LEFT SECTION --- */
+.left-section {
+    flex: 1;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 480px;
+}
+
+.welcome-text {
+    color: #0d4d40; /* Dark Green matched from image */
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.sub-text {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+/* Input Groups */
+.input-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+/* Email Specific Styles */
+.email-group label {
+    position: absolute;
+    top: -8px;
+    left: 12px;
+    background-color: white;
+    padding: 0 5px;
+    font-size: 12px;
+    color: #333;
+    font-weight: 600;
+    z-index: 10;
+}
+
+.email-group input {
+    width: 100%;
+    padding: 14px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    color: #000;
+}
+
+.email-group input:focus {
+    border-color: #0d4d40;
+}
+
+/* Password Specific Styles */
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.password-group input {
+    width: 100%;
+    padding: 14px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #eff4f9; /* Light blueish grey background */
+    outline: none;
+}
+
+.password-group input::placeholder {
+    color: #999;
+}
+
+.show-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: #0d4d40;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.char-count {
+    text-align: right;
+    font-size: 11px;
+    color: #999;
+    margin-top: 4px;
+}
+
+/* Button */
+.login-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #0d4d40;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 10px;
+}
+
+.login-btn:hover {
+    background-color: #08382e;
+}
+
+/* Footer Link */
+.form-footer {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+    color: #333;
+}
+
+.form-footer a {
+    color: #0d4d40;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+/* --- RIGHT SECTION --- */
+.right-section {
+    flex: 1;
+    background-color: #0d4d40; /* The Primary Green */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 60px;
+}
+
+.content-wrapper {
+    max-width: 500px;
+}
+
+.right-section h1 {
+    color: white;
+    font-size: 36px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.right-section p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* --- Responsive Layout for Mobile --- */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .right-section {
+        display: none; /* Often hidden on mobile, or you can set order: -1 to show top */
+    }
+    
+    .left-section {
+        padding: 20px;
+    }
+}
