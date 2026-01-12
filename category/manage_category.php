@@ -52,9 +52,9 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
         <nav class="nav-menu">
             <a href="../admin/admin_dashboard.php" class="nav-item">Dashboard</a>
             <a href="manage_category.php" class="nav-item active">Categories</a>
-            <a href="../admin/manage_feedback.php" class="nav-item">Feedback</a>
+            <a href="../admin/manage_tags.php" class="nav-item">Manage Tags</a>
             <a href="../admin/manage_users.php" class="nav-item">Users</a>
-            <a href="../admin/reports.php" class="nav-item">Reports</a>
+            
         </nav>
     </aside>
 
