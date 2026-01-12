@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 
 include('../db/db.php');
 
-// Fetch user details
+// Fetch user details from management_user table
 $user_id = $_SESSION['user_id'];
 $sql = "SELECT * FROM management_user WHERE user_id = ?";
 $stmt = $conn->prepare($sql);
@@ -30,13 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
 
-    // Validate inputs
     if (empty($name) || empty($email)) {
         $error_message = "All fields are required.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error_message = "Invalid email format.";
     } else {
-        // Check if email already exists (except for current user)
+        // Check if email already exists (excluding current user)
         $check_sql = "SELECT user_id FROM management_user WHERE email = ? AND user_id != ?";
         $check_stmt = $conn->prepare($check_sql);
         $check_stmt->bind_param("si", $email, $user_id);
@@ -52,20 +51,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $update_stmt->bind_param("ssi", $name, $email, $user_id);
 
             if ($update_stmt->execute()) {
-                $_SESSION['name'] = $name; // Update session
+                $_SESSION['name'] = $name; 
                 $success_message = "Profile updated successfully!";
-                // Refresh user data
                 $user['name'] = $name;
                 $user['email'] = $email;
             } else {
-                $error_message = "Error updating profile: " . $update_stmt->error;
+                $error_message = "Error updating profile.";
             }
             $update_stmt->close();
         }
         $check_stmt->close();
     }
 }
-
 $conn->close();
 ?>
 
@@ -75,251 +72,91 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            background-color: #0C4F3B;
+            background-image: radial-gradient(circle at 10% 20%, rgba(30, 179, 134, 0.2) 0%, transparent 40%),
+                              radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 40%);
+            min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
         }
-        
-        .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            max-width: 600px;
-            width: 100%;
-            padding: 40px;
+        .profile-card {
+            background: rgba(255, 255, 255, 0.98); width: 100%; max-width: 480px;
+            border-radius: 32px; padding: 40px; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.4);
+            position: relative; overflow: hidden;
         }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
+        .profile-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 8px;
+            background: linear-gradient(90deg, #1eb386, #0C4F3B);
         }
-        
-        .header .icon {
-            font-size: 64px;
-            margin-bottom: 15px;
+        .header { text-align: center; margin-bottom: 30px; }
+        .avatar {
+            width: 70px; height: 70px; background: #0C4F3B; color: white;
+            border-radius: 20px; display: flex; align-items: center; justify-content: center;
+            font-size: 28px; font-weight: 700; margin: 0 auto 15px; transform: rotate(-3deg);
         }
-        
-        .header h2 {
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 10px;
+        .role-badge {
+            display: inline-block; background: rgba(12, 79, 59, 0.08); color: #0C4F3B;
+            padding: 4px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-top: 8px;
         }
-        
-        .header p {
-            color: #6c757d;
-            font-size: 14px;
-        }
-        
-        .message {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
-        }
-        
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
-        
-        .info-box {
-            background: #e7f3ff;
-            border-left: 4px solid #0066cc;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .info-box h4 {
-            font-size: 14px;
-            color: #0066cc;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            font-size: 13px;
-            color: #333;
-            border-bottom: 1px solid rgba(0, 102, 204, 0.1);
-        }
-        
-        .info-item:last-child {
-            border-bottom: none;
-        }
-        
-        .info-item span:first-child {
-            font-weight: 600;
-            color: #0066cc;
-        }
-        
-        form {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        
-        label {
-            display: block;
-            margin-top: 15px;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
-        }
-        
+        .alert { padding: 12px; border-radius: 12px; margin-bottom: 20px; font-size: 14px; text-align: center; font-weight: 600; }
+        .alert-success { background: #e6f7ed; color: #1e7d4d; }
+        .alert-error { background: #fff1f1; color: #c53030; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 12px; font-weight: 700; color: #4a5568; margin-bottom: 8px; text-transform: uppercase; }
         input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e8ed;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
+            width: 100%; padding: 14px 18px; border: 2px solid #edf2f7; border-radius: 14px;
+            font-size: 15px; background: #f8fafc; transition: 0.3s;
         }
-        
-        input:focus {
-            outline: none;
-            border-color: #667eea;
+        input:focus { outline: none; border-color: #0C4F3B; background: #fff; box-shadow: 0 0 0 4px rgba(12, 79, 59, 0.1); }
+        .btn-save {
+            width: 100%; background: #0C4F3B; color: white; border: none; padding: 16px;
+            border-radius: 16px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s;
         }
-        
-        input[type="submit"] {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-top: 20px;
-            font-weight: 600;
-            transition: transform 0.3s ease;
-        }
-        
-        input[type="submit"]:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .btn {
-            flex: 1;
-            padding: 12px 20px;
-            border-radius: 6px;
-            text-decoration: none;
-            text-align: center;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-warning {
-            background: #ffc107;
-            color: #000;
-        }
-        
-        .btn-warning:hover {
-            background: #e0a800;
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-        
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            background: #667eea;
-            color: white;
-        }
+        .btn-save:hover { background: #127a5b; transform: translateY(-2px); }
+        .footer { display: flex; justify-content: space-between; margin-top: 25px; padding-top: 20px; border-top: 1px solid #edf2f7; }
+        .link { color: #0C4F3B; text-decoration: none; font-size: 14px; font-weight: 700; }
+        .btn-back { background: #f1f5f9; color: #718096; padding: 8px 16px; border-radius: 10px; text-decoration: none; font-size: 13px; font-weight: 600; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="profile-card">
     <div class="header">
-        <div class="icon">👤</div>
-        <h2>My Profile</h2>
-        <p>Manage your account information</p>
+        <div class="avatar"><?php echo strtoupper(substr($user['name'], 0, 1)); ?></div>
+        <h2>Profile Details</h2>
+        <span class="role-badge"><?php echo htmlspecialchars($user['role']); ?></span>
     </div>
-    
+
     <?php if (isset($success_message)): ?>
-        <div class="message success">✅ <?php echo htmlspecialchars($success_message); ?></div>
+        <div class="alert alert-success">✨ <?php echo $success_message; ?></div>
     <?php endif; ?>
 
     <?php if (isset($error_message)): ?>
-        <div class="message error">❌ <?php echo htmlspecialchars($error_message); ?></div>
+        <div class="alert alert-error">⚠️ <?php echo $error_message; ?></div>
     <?php endif; ?>
 
-    <div class="info-box">
-        <h4>📊 Account Information</h4>
-        <div class="info-item">
-            <span>User ID:</span>
-            <span>#<?php echo htmlspecialchars($user['user_id']); ?></span>
+    <form method="POST">
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" name="name" value="<?php echo htmlspecialchars($user['name']); ?>" required>
         </div>
-        <div class="info-item">
-            <span>Role:</span>
-            <span class="badge"><?php echo htmlspecialchars(ucfirst($user['role'])); ?></span>
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
         </div>
-        <div class="info-item">
-            <span>Member Since:</span>
-            <span><?php echo date('M d, Y', strtotime($user['created_at'])); ?></span>
-        </div>
-    </div>
-
-    <form method="POST" action="">
-        <label for="name">Full Name *</label>
-        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($user['name']); ?>" required>
-
-        <label for="email">Email Address *</label>
-        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
-
-        <input type="submit" value="💾 Update Profile">
+        <button type="submit" class="btn-save">Save Changes</button>
     </form>
 
-    <div class="button-group">
-        <a href="change_password.php" class="btn btn-warning">🔒 Change Password</a>
+    <div class="footer">
+        <a href="change_password.php" class="link">🔒 Security</a>
         <?php
-        // Dynamic back link based on role
-        if ($_SESSION['role'] == 'admin') {
-            echo '<a href="../admin/admin_dashboard.php" class="btn btn-secondary">← Back</a>';
-        } elseif ($_SESSION['role'] == 'hr') {
-            echo '<a href="../hr/hr_dashboard.php" class="btn btn-secondary">← Back</a>';
-        } else {
-            echo '<a href="user_dashboard.php" class="btn btn-secondary">← Back</a>';
-        }
+            $dash = "user_dashboard.php";
+            if($user['role'] == 'admin') $dash = "../admin/admin_dashboard.php";
+            elseif($user['role'] == 'hr') $dash = "../hr/hr_dashboard.php";
         ?>
+        <a href="<?php echo $dash; ?>" class="btn-back">Dashboard</a>
     </div>
 </div>
 
