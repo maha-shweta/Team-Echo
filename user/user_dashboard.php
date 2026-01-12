@@ -142,7 +142,7 @@ if ($has_user_id) {
 
             <!-- Quick Action Button -->
             <div style="margin-bottom: 25px;">
-                <a href="../feedback/submit_feedback.php" class="button btn-success" style="font-size: 15px; padding: 12px 25px;">
+                <a href="../feedback/submit_feedback.php" class="button btn-success" style="font-size: 15px; padding: 12px 25px; background-color: #0C4F3B;">
                     Submit New Feedback
                 </a>
             </div>
@@ -258,7 +258,7 @@ if ($has_user_id) {
                     <div class="filter-buttons">
                         <button type="submit" class="button btn-primary">Apply Filters</button>
                         <a href="user_dashboard.php?view=<?php echo $view_mode; ?>" 
-                           class="button btn-success">Clear Filters</a>
+                           class="button btn-success" style="background-color: white; color: #0C4F3B;border: 1px solid #0C4F3B;">Clear Filters</a>
                     </div>
                 </form>
             </div>
@@ -386,6 +386,8 @@ if ($has_user_id) {
     </div>
 </div>
 
+
+<?php include('../includes/chatbot.php'); ?>
 </body>
 </html>
 <?php $conn->close(); ?>
