@@ -112,7 +112,7 @@ $conn->close();
 
                     <!-- Footer Links -->
                     <div class="form-footer">
-                        Don't have an account? <a href="registration.html">Create Account</a>
+                        Don't have an account? <a href="register.php">Create Account</a>
                     </div>
                 </form>
             </div>
