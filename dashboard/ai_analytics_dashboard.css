@@ -1,0 +1,30 @@
+:root { --primary: #0099cc; --dark: #007399; --bg: #f4f7f9; }
+body { background: var(--bg); font-family: 'Segoe UI', sans-serif; margin: 0; color: #333; }
+
+.top-nav { background: var(--dark); padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; color: white; }
+.filter-form { display: flex; gap: 8px; }
+.filter-form input, .filter-form select { background: #ffffff22; border: 1px solid #fff3; color: black; padding: 5px; border-radius: 4px; font-size: 12px; }
+.filter-btn { background: white; color: var(--dark); border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+.reset-link { color: #ffdada; text-decoration: none; font-size: 11px; }
+
+.dashboard-layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; padding: 20px; }
+.metric-box { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid var(--primary); box-shadow: 0 2px 5px #0001; }
+.metric-label { font-size: 10px; text-transform: uppercase; color: #888; letter-spacing: 0.5px; }
+.metric-value { font-size: 22px; font-weight: bold; margin-top: 5px; }
+.trend-badge { font-size: 12px; margin-left: 5px; }
+.heatmap-item { padding: 6px; font-size: 12px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+
+.main-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.card { background: white; padding: 15px; border-radius: 8px; border: 1px solid #ddd; transition: 0.3s; }
+.card-title { font-size: 12px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; color: #666; display: flex; justify-content: space-between; }
+.chart-container { height: 160px; position: relative; }
+.word-cloud-wide { grid-column: span 2; }
+
+/* Alert Styling */
+.alert-active { border: 1px solid #e74c3c !important; animation: pulse-red 2s infinite; }
+.alert-active::before { content: "⚠️ ALERT"; position: absolute; top: -10px; right: 10px; background: #e74c3c; color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; }
+@keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); } 100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); } }
+
+.card-summary { display: flex; align-items: baseline; gap: 5px; }
+.summary-value { font-size: 16px; font-weight: bold; color: #1a2b49; }
+.summary-trend { font-size: 11px; font-weight: 600; }
