@@ -17,8 +17,9 @@ $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 $date_from = isset($_GET['date_from']) ? $_GET['date_from'] : '';
 $date_to = isset($_GET['date_to']) ? $_GET['date_to'] : '';
 
-// Build SQL query with filters
-$sql = "SELECT f.feedback_id, f.feedback_text, f.submitted_at, c.category_name, f.is_resolved, f.priority,
+// Build SQL query with filters - Added sentiment_label
+$sql = "SELECT f.feedback_id, f.feedback_text, f.submitted_at, c.category_name, 
+               f.is_resolved, f.priority, f.sentiment_label,
         (SELECT GROUP_CONCAT(t.tag_name SEPARATOR ', ') 
          FROM feedback_tags ft 
          JOIN tags t ON ft.tag_id = t.tag_id 
@@ -96,9 +97,11 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
             <div class="system-title">Feedback System</div>
             <nav class="nav-menu">
                 <a href="hr_dashboard.php" class="nav-item active">Dashboard</a>
-                <a href="../admin/analytics_dashboard.php" class="nav-item">Analytics</a>
+                <a href="analytics_dashboard.php" class="nav-item">Analytics</a>
+                <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+            
                 <a href="../feedback/export_feedback.php" class="nav-item">Export Data</a>
-                <a href="generate_feedback_report.php" class="nav-item">Reports</a>
+                <!-- <a href="generate_feedback_report.php" class="nav-item">Reports</a> -->
                 <a href="../user/profile.php" class="nav-item">Profile</a>
             </nav>
         </aside>
@@ -223,6 +226,7 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
                                 <th>ID</th>
                                 <th>Priority</th>
                                 <th>Category</th>
+                                <th>Sentiment</th>
                                 <th>Feedback</th>
                                 <th>Tags</th>
                                 <th>Submitted</th>
@@ -243,15 +247,35 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
                                 }
                             ?>
                             <tr class="<?php echo trim($row_class); ?>">
+                                <!-- ID Column -->
                                 <td><strong>#<?php echo htmlspecialchars($row['feedback_id']); ?></strong></td>
+                                
+                                <!-- Priority Column -->
                                 <td>
                                     <span class="priority-badge priority-<?php echo $row['priority'] ?? 'medium'; ?>">
                                         <span class="priority-dot"></span>
                                         <?php echo strtoupper($row['priority'] ?? 'MEDIUM'); ?>
                                     </span>
                                 </td>
+                                
+                                <!-- Category Column -->
                                 <td><?php echo htmlspecialchars($row['category_name']); ?></td>
+                                
+                                <!-- Sentiment Column -->
+                                <td>
+                                    <?php 
+                                    $sentiment = $row['sentiment_label'] ?? 'Pending';
+                                    $sentiment_class = strtolower($sentiment);
+                                    ?>
+                                    <span class="sentiment-badge sentiment-<?php echo $sentiment_class; ?>">
+                                        <?php echo htmlspecialchars($sentiment); ?>
+                                    </span>
+                                </td>
+                                
+                                <!-- Feedback Text Column -->
                                 <td><?php echo htmlspecialchars(substr($row['feedback_text'], 0, 80)) . (strlen($row['feedback_text']) > 80 ? '...' : ''); ?></td>
+                                
+                                <!-- Tags Column -->
                                 <td>
                                     <?php
                                     if (!empty($row['tags'])) {
@@ -267,7 +291,11 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
                                     }
                                     ?>
                                 </td>
+                                
+                                <!-- Submitted Date Column -->
                                 <td><?php echo date('M d, Y', strtotime($row['submitted_at'])); ?></td>
+                                
+                                <!-- Status Column -->
                                 <td>
                                     <?php if ($row['is_resolved']): ?>
                                         <span class="badge badge-resolved">Resolved</span>
@@ -275,6 +303,8 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
                                         <span class="badge badge-unresolved">Unresolved</span>
                                     <?php endif; ?>
                                 </td>
+                                
+                                <!-- Actions Column -->
                                 <td>
                                     <a href="../feedback/view_feedback.php?id=<?php echo $row['feedback_id']; ?>" class="action-link">
                                         View
@@ -306,6 +336,9 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
     </div>
 </body>
 </html>
+
+<?php include('../includes/chatbot.php'); ?>
+
 <?php
 $conn->close();
 ?>
