@@ -62,6 +62,33 @@ Anonymous Feedback System
 
 
 
+#### (Rishta)
+##  AI & NLP Integration
+
+###  Smart Chatbot Assistant
+The system features an integrated **AI Chatbot** designed to enhance user engagement and streamline the feedback process:
+* **Real-time Assistance:** Acts as a 24/7 guide, helping users navigate the platform and answering common questions.
+* **Interactive UI:** Seamlessly integrated into the bottom-right corner using a modern, floating interface.
+* **Pre-screening:** Encourages users to provide more detailed feedback before submission.
+
+###  Python-Powered Sentiment Analysis
+The "Team-Echo AI" engine bridges **PHP** and **Python (NLTK)** to understand the emotional "temperature" of the organization:
+
+* **Natural Language Processing (NLP):** Every piece of feedback is processed through the **VADER (Valence Aware Dictionary and sEntiment Reasoner)** lexicon to calculate emotional intensity.
+* **Team Mood Tracking:** Aggregates individual scores into a "Team Mood" percentage bar, allowing HR to see general satisfaction levels at a glance.
+* **Visual Data Labeling:** Automatically color-codes feedback:
+    * 🟢 **Positive:** High satisfaction.
+    * 🟡 **Neutral:** Informational/Balanced.
+    * 🔴 **Negative:** Urgent issues requiring attention.
+
+###  Technical Workflow
+1. **PHP** retrieves raw feedback from the **MySQL** database.
+2. The text is passed to a **Python** script via `shell_exec()`.
+3. The **NLTK Library** analyzes the text and returns a JSON sentiment score.
+4. The dashboard renders the data into a visual "Mood Bar" and categorized feedback cards.
+
+
+
 
 
 
