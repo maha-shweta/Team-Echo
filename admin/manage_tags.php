@@ -80,7 +80,7 @@ $tags_result = $conn->query($tags_sql);
         
         /* Header */
         .header {
-            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+            background: linear-gradient(135deg, #0C4F3B 0%, #5a32a3 100%);
             color: white;
             padding: 30px;
             border-radius: 12px;
