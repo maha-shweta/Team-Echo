@@ -111,6 +111,7 @@ if ($has_user_id) {
             <a href="user_dashboard.php" class="nav-item active">Dashboard</a>
             <a href="../feedback/submit_feedback.php" class="nav-item">Submit Feedback</a>
             <a href="../admin/analytics_dashboard.php" class="nav-item">Analytics</a>
+            <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
             <a href="profile.php" class="nav-item">My Profile</a>
         </nav>
     </aside>
