@@ -1,0 +1,497 @@
+/* ================================================
+   ADD CATEGORY CSS - UNIFIED DESIGN
+   ================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f5f7f8;
+}
+
+/* ================================================
+   COLOR VARIABLES
+   ================================================ */
+:root {
+    --primary-green-dark: #0c4f3b; 
+    --accent-green-light: #32b25e;
+    --pending-color: #f39c12;
+    --critical-color: #dc3545;
+    --high-priority-color: #fd7e14;
+    --text-dark: #333;
+    --text-muted: #6c757d;
+    --border-light: #e1e8ed;
+    --bg-white: #ffffff;
+}
+
+/* ================================================
+   LAYOUT STRUCTURE
+   ================================================ */
+.main-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ================================================
+   SIDEBAR
+   ================================================ */
+.sidebar {
+    width: 240px;
+    background-color: var(--bg-white);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    padding: 20px 0;
+    flex-shrink: 0;
+}
+
+.system-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-green-dark);
+    padding: 0 20px 30px 20px;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-item {
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #555;
+    font-size: 15px;
+    transition: background-color 0.2s, color 0.2s;
+    border-left: 5px solid transparent;
+}
+
+.nav-item.active {
+    background-color: #f0f8ff;
+    color: var(--primary-green-dark);
+    font-weight: 600;
+    border-left-color: var(--primary-green-dark);
+}
+
+.nav-item:hover:not(.active) {
+    background-color: #f9f9f9;
+}
+
+/* ================================================
+   MAIN CONTENT AREA
+   ================================================ */
+.content-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ================================================
+   TOP HEADER
+   ================================================ */
+.top-header {
+    background-color: var(--primary-green-dark);
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.welcome-text {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+/* ================================================
+   BUTTONS
+   ================================================ */
+.logout-btn,
+.btn-header {
+    background-color: var(--primary-green-dark);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 8px 22px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.10);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.logout-btn:hover,
+.btn-header:hover {
+    background-color: #085826;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.button {
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-back {
+    background: white;
+    color: var(--primary-green-dark);
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 2px solid var(--border-light);
+}
+
+.btn-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    border-color: var(--primary-green-dark);
+}
+
+/* ================================================
+   DASHBOARD CONTENT
+   ================================================ */
+.dashboard-content {
+    padding: 30px;
+    max-width: 100%;
+    width: 100%;
+}
+
+.container {
+    max-width: 100%;
+    width: 100%;
+}
+
+/* ================================================
+   PAGE HEADER
+   ================================================ */
+.page-header {
+    margin-bottom: 25px;
+}
+
+.page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-green-dark);
+    margin-bottom: 8px;
+}
+
+.page-header p {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+/* Back button container */
+.page-header > div {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* ================================================
+   MESSAGES
+   ================================================ */
+.message {
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid var(--critical-color);
+}
+
+/* ================================================
+   HEADER CARD (replaces old header styling)
+   ================================================ */
+.header-card {
+    background: var(--bg-white);
+    border-radius: 8px;
+    padding: 0;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.header-card h1 {
+    font-size: 28px;
+    color: var(--primary-green-dark);
+    margin-bottom: 8px;
+    font-weight: 700;
+    padding: 25px 25px 0 25px;
+}
+
+.header-card p {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.5;
+    padding: 0 25px 25px 25px;
+}
+
+/* ================================================
+   INFO BOX
+   ================================================ */
+.info-box {
+    background: var(--bg-white);
+    padding: 20px 25px;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-green-dark);
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.info-box h4 {
+    color: var(--primary-green-dark);
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.info-box ul {
+    margin-left: 20px;
+    color: #495057;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+.info-box li {
+    margin-bottom: 6px;
+}
+
+/* ================================================
+   FORM CARD
+   ================================================ */
+.form-card {
+    background: var(--bg-white);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+}
+
+/* ================================================
+   FORM STYLING
+   ================================================ */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #495057;
+    font-size: 13px;
+}
+
+.required {
+    color: var(--critical-color);
+    margin-left: 3px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid var(--border-light);
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-green-dark);
+}
+
+.help-text {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    display: block;
+}
+
+/* ================================================
+   SUBMIT BUTTON
+   ================================================ */
+.btn-primary {
+    width: 100%;
+    padding: 12px 24px;
+    background: var(--primary-green-dark);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-primary:hover {
+    background: #085826;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* ================================================
+   BUTTON GROUP
+   ================================================ */
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+.btn-secondary {
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    flex: 1;
+    min-width: 180px;
+    background: var(--text-muted);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* ================================================
+   RESPONSIVE DESIGN
+   ================================================ */
+@media (max-width: 768px) {
+    .main-layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .dashboard-content {
+        padding: 15px;
+    }
+
+    .top-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .header-buttons {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .header-card,
+    .form-card,
+    .info-box {
+        padding: 20px;
+    }
+
+    .header-card h1 {
+        font-size: 22px;
+        padding: 20px 20px 0 20px;
+    }
+
+    .header-card p {
+        padding: 0 20px 20px 20px;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .btn-secondary {
+        min-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .system-title {
+        font-size: 18px;
+    }
+
+    .welcome-text {
+        font-size: 16px;
+    }
+
+    .page-header h1,
+    .header-card h1 {
+        font-size: 22px;
+    }
+
+    .button {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .btn-primary {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+
+    .form-group label {
+        font-size: 12px;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+}
