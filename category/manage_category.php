@@ -32,7 +32,7 @@ $total_categories = $conn->query("SELECT COUNT(*) as count FROM category")->fetc
 $total_feedback = $conn->query("SELECT COUNT(*) as count FROM feedback")->fetch_assoc()['count'];
 
 // Get username safely
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
+$username = isset($_SESSION['name']) ? $_SESSION['name'] : 'Admin';
 ?>
 
 <!DOCTYPE html>
@@ -40,7 +40,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Categories</title>
+    <title>Manage Categories - Anonymous Feedback System</title>
     <link rel="stylesheet" href="manage_category.css">
 </head>
 <body>
@@ -51,10 +51,12 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
         <div class="system-title">Feedback System</div>
         <nav class="nav-menu">
             <a href="../admin/admin_dashboard.php" class="nav-item">Dashboard</a>
-            <a href="manage_category.php" class="nav-item active">Categories</a>
-            <a href="../admin/manage_feedback.php" class="nav-item">Feedback</a>
-            <a href="../admin/manage_users.php" class="nav-item">Users</a>
-            <a href="../admin/reports.php" class="nav-item">Reports</a>
+            <a href="../admin/manage_users.php" class="nav-item">Manage Users</a>
+            <a href="manage_category.php" class="nav-item active">Manage Categories</a>
+            <a href="../admin/manage_tags.php" class="nav-item">Manage Tags</a>
+            <a href="../admin/analytics_dashboard.php" class="nav-item">Analytics</a>
+            <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+            <a href="../feedback/export_feedback.php" class="nav-item">Export Feedback</a>
         </nav>
     </aside>
 
@@ -66,13 +68,16 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
                 Welcome, <?php echo htmlspecialchars($username); ?>
             </div>
             <div class="header-buttons">
-                <a href="add_category.php" class="btn-header">+ Add New Category</a>
+                <a href="../user/profile.php" class="btn-header">Profile</a>
                 <a href="../user/logout.php" class="logout-btn">Logout</a>
             </div>
         </header>
 
         <!-- Dashboard Content -->
         <main class="dashboard-content">
+            <!-- Back Button -->
+            <a href="../admin/admin_dashboard.php" class="button btn-back">← Back to Dashboard</a>
+
             <!-- Page Header -->
             <div class="page-header">
                 <h1>Category Management</h1>
@@ -94,17 +99,14 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
             <!-- Statistics -->
             <div class="stats-container">
                 <div class="stat-card">
-                    <div class="icon">📁</div>
                     <h3><?php echo $total_categories; ?></h3>
                     <p>Total Categories</p>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">💬</div>
                     <h3><?php echo $total_feedback; ?></h3>
                     <p>Total Feedback</p>
                 </div>
                 <div class="stat-card">
-                    <div class="icon">📊</div>
                     <h3><?php echo $result->num_rows; ?></h3>
                     <p>Search Results</p>
                 </div>
@@ -124,6 +126,7 @@ $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
                     <?php if (!empty($search_query)): ?>
                         <a href="manage_category.php" class="clear-search">Clear</a>
                     <?php endif; ?>
+                    <a href="add_category.php" class="add-user-btn">+ Add New Category</a>
                 </form>
             </div>
 
