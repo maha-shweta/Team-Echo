@@ -107,7 +107,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit Feedback - Anonymous Feedback System</title>
     <link rel="stylesheet" href="submit_feedback.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -119,6 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <a href="../user/user_dashboard.php" class="nav-item">Dashboard</a>
             <a href="submit_feedback.php" class="nav-item active">Submit Feedback</a>
             <a href="../admin/analytics_dashboard.php" class="nav-item">Analytics</a>
+            <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
             <a href="../user/profile.php" class="nav-item">My Profile</a>
         </nav>
     </aside>
