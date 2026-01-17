@@ -249,18 +249,18 @@ function displayComment($comment, $current_user_id, $is_hr_admin, $current_user_
             <div class="comment-actions">
                 <!-- Reply Button -->
                 <a href="javascript:void(0);" class="comment-action-link" onclick="toggleReplyForm(<?php echo $comment['comment_id']; ?>)">
-                    💬 Reply
+                    Reply
                 </a>
                 
                 <?php if ($can_edit_delete && $can_edit_time): ?>
                 <a href="edit_comment.php?id=<?php echo $comment['comment_id']; ?>" class="comment-action-link">
-                    ✏️ Edit
+                    Edit
                 </a>
                 <?php endif; ?>
                 
                 <?php if ($can_edit_delete): ?>
                 <a href="delete_comment.php?id=<?php echo $comment['comment_id']; ?>" class="comment-action-link delete" onclick="return confirm('Are you sure you want to delete this comment and all its replies?');">
-                    🗑️ Delete
+                    Delete
                 </a>
                 <?php endif; ?>
             </div>
@@ -304,7 +304,7 @@ function displayComment($comment, $current_user_id, $is_hr_admin, $current_user_
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback Details</title>
+    <title>Feedback Details - Anonymous Feedback System</title>
     <link rel="stylesheet" href="view_feedback.css">
     <script>
         function toggleReplyForm(commentId) {
@@ -326,21 +326,26 @@ function displayComment($comment, $current_user_id, $is_hr_admin, $current_user_
     <aside class="sidebar">
         <div class="system-title">Feedback System</div>
         <nav class="nav-menu">
-            <?php if ($is_hr_admin): ?>
-                <a href="<?php echo $current_user_role == 'admin' ? '../admin/admin_dashboard.php' : '../hr/hr_dashboard.php'; ?>" class="nav-item">Dashboard</a>
-                <?php if ($current_user_role == 'admin'): ?>
-                    <a href="../admin/manage_users.php" class="nav-item">Manage Users</a>
-                <?php endif; ?>
-                <a href="../category/manage_category.php" class="nav-item">Manage Categories</a>
-                <a href="../admin/manage_tags.php" class="nav-item">Manage Tags</a>
+            <?php if ($current_user_role == 'admin'): ?>
+                <a href="../admin/admin_dashboard.php" class="nav-item">Dashboard</a>
+                <a href="../admin/manage_users.php" class="nav-item">Manage Users</a>
+                <a href="../admin/manage_categories.php" class="nav-item">Categories</a>
+                <a href="../admin/manage_tags.php" class="nav-item">Tags</a>
                 <a href="../admin/analytics_dashboard.php" class="nav-item">Analytics</a>
-                <a href="export_feedback.php" class="nav-item">Export Feedback</a>
+                <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+                <a href="../user/profile.php" class="nav-item">My Profile</a>
+            <?php elseif ($current_user_role == 'hr'): ?>
+                <a href="../hr/hr_dashboard.php" class="nav-item">Dashboard</a>
+                <a href="../admin/analytics_dashboard.php" class="nav-item">Analytics</a>
+                <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+                <a href="../user/profile.php" class="nav-item">My Profile</a>
             <?php else: ?>
                 <a href="../user/user_dashboard.php" class="nav-item">Dashboard</a>
-                <a href="../user/submit_feedback.php" class="nav-item">Submit Feedback</a>
-                <a href="../user/my_feedback.php" class="nav-item">My Feedback</a>
+                <a href="submit_feedback.php" class="nav-item">Submit Feedback</a>
+                <a href="../admin/analytics_dashboard.php" class="nav-item">Analytics</a>
+                <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+                <a href="../user/profile.php" class="nav-item">My Profile</a>
             <?php endif; ?>
-            <a href="view_feedback.php?id=<?php echo $feedback_id; ?>" class="nav-item active">View Feedback</a>
         </nav>
     </aside>
 
@@ -383,7 +388,7 @@ function displayComment($comment, $current_user_id, $is_hr_admin, $current_user_
                             <div class="attachment-icon"><?php echo $file_type_display; ?></div>
                             <div class="attachment-info">
                                 <a href="<?php echo htmlspecialchars($attachment['file_path']); ?>" target="_blank" class="attachment-name" title="<?php echo htmlspecialchars($attachment['file_name']); ?>">
-                                    <?php echo htmlspecialchars($attachment['file_name']); ?></span>
+                                    <?php echo htmlspecialchars($attachment['file_name']); ?>
                                 </a>
                                 <div class="attachment-meta">
                                     <span class="attachment-size"><?php echo round($attachment['file_size'] / 1024, 2); ?> KB</span>
