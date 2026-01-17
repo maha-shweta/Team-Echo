@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    font-family: Arial, sans-serif;
 }
 
 body {
@@ -119,6 +119,24 @@ body {
     padding: 30px;
     max-width: 100%;
     width: 100%;
+}
+
+/* --- Page Header --- */
+.page-header {
+    margin-bottom: 25px;
+}
+
+.page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-green-dark);
+    margin-bottom: 8px;
+}
+
+.page-header p {
+    font-size: 15px;
+    color: #6c757d;
+    line-height: 1.5;
 }
 
 /* --- Messages --- */
@@ -405,6 +423,10 @@ tbody tr:last-child td {
         width: 100%;
         justify-content: flex-start;
     }
+
+    .page-header h1 {
+        font-size: 22px;
+    }
     
     .user-controls {
         flex-direction: column;
@@ -454,5 +476,10 @@ tbody tr:last-child td {
     th:nth-child(3), 
     td:nth-child(3) {
         display: none;
+    }
+
+    .button {
+        padding: 8px 16px;
+        font-size: 13px;
     }
 }
