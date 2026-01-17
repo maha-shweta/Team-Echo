@@ -1,31 +1,46 @@
+/* ================================================
+   SUBMIT FEEDBACK CSS - UNIFIED WITH DASHBOARD
+   ================================================ */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    font-family: Arial, sans-serif;
 }
 
 body {
     background-color: #f5f7f8;
 }
 
-/* --- Color Variables --- */
+/* ================================================
+   COLOR VARIABLES (SAME AS DASHBOARD)
+   ================================================ */
 :root {
     --primary-green-dark: #0c4f3b; 
     --accent-green-light: #32b25e;
     --pending-color: #f39c12;
+    --critical-color: #dc3545;
+    --text-dark: #333;
+    --text-muted: #6c757d;
+    --border-light: #e1e8ed;
+    --bg-white: #ffffff;
 }
 
-/* --- Layout Structure --- */
+/* ================================================
+   LAYOUT STRUCTURE (IDENTICAL TO DASHBOARD)
+   ================================================ */
 .main-layout {
     display: flex;
     min-height: 100vh;
 }
 
-/* --- Sidebar Styling --- */
+/* ================================================
+   SIDEBAR (IDENTICAL TO DASHBOARD)
+   ================================================ */
 .sidebar {
     width: 240px;
-    background-color: #ffffff; 
+    background-color: var(--bg-white);
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
     padding: 20px 0;
     flex-shrink: 0;
@@ -53,24 +68,28 @@ body {
 }
 
 .nav-item.active {
-    background-color: #f0f8ff; 
+    background-color: #f0f8ff;
     color: var(--primary-green-dark);
     font-weight: 600;
-    border-left-color: var(--primary-green-dark); 
+    border-left-color: var(--primary-green-dark);
 }
 
 .nav-item:hover:not(.active) {
     background-color: #f9f9f9;
 }
 
-/* --- Main Content Area --- */
+/* ================================================
+   MAIN CONTENT AREA (IDENTICAL TO DASHBOARD)
+   ================================================ */
 .content-area {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
 
-/* --- Top Header Bar --- */
+/* ================================================
+   TOP HEADER (IDENTICAL TO DASHBOARD)
+   ================================================ */
 .top-header {
     background-color: var(--primary-green-dark);
     color: white;
@@ -102,7 +121,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     letter-spacing: 0.3px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.10);
     transition: background-color 0.2s ease, box-shadow 0.2s ease;
     text-decoration: none;
     display: inline-block;
@@ -111,23 +130,26 @@ body {
 .logout-btn:hover,
 .btn-header:hover {
     background-color: #085826;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* --- Dashboard Content --- */
+/* ================================================
+   DASHBOARD CONTENT (IDENTICAL TO DASHBOARD)
+   ================================================ */
 .dashboard-content {
     padding: 30px;
     max-width: 100%;
     width: 100%;
 }
 
-/* --- Container - MATCH DASHBOARD WIDTH --- */
 .container {
     max-width: 100%;
     width: 100%;
 }
 
-/* --- Messages --- */
+/* ================================================
+   MESSAGES (IDENTICAL TO DASHBOARD)
+   ================================================ */
 .message {
     padding: 15px 20px;
     margin-bottom: 20px;
@@ -139,14 +161,20 @@ body {
 }
 
 @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .error {
     background-color: #f8d7da;
     color: #721c24;
-    border-left: 4px solid #dc3545;
+    border-left: 4px solid var(--critical-color);
 }
 
 .success {
@@ -155,7 +183,9 @@ body {
     border-left: 4px solid #28a745;
 }
 
-/* --- Buttons --- */
+/* ================================================
+   BUTTONS (MATCHING DASHBOARD STYLE)
+   ================================================ */
 .button {
     padding: 10px 20px;
     border-radius: 6px;
@@ -172,21 +202,21 @@ body {
     background: white;
     color: var(--primary-green-dark);
     margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    border: 2px solid #e1e8ed;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 2px solid var(--border-light);
 }
 
 .btn-back:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     border-color: var(--primary-green-dark);
 }
 
 .btn-primary {
     background: var(--primary-green-dark);
     color: white;
-    padding: 14px 32px;
-    font-size: 16px;
+    padding: 12px 24px;
+    font-size: 14px;
     width: 100%;
 }
 
@@ -196,36 +226,40 @@ body {
     box-shadow: 0 6px 20px rgba(12, 79, 59, 0.3);
 }
 
-/* --- Header Card - MATCH DASHBOARD TABLE CONTAINER --- */
+/* ================================================
+   HEADER CARD (MATCHING TABLE HEADER STYLE)
+   ================================================ */
 .header-card {
-    background: white;
+    background: var(--bg-white);
     border-radius: 8px;
     padding: 25px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .header-card h1 {
-    font-size: 22px;
+    font-size: 20px;
     color: var(--primary-green-dark);
     margin-bottom: 8px;
     font-weight: 600;
 }
 
 .header-card p {
-    color: #6c757d;
+    color: var(--text-muted);
     font-size: 14px;
     line-height: 1.6;
 }
 
-/* --- Info Box - MATCH DASHBOARD CONTAINER --- */
+/* ================================================
+   INFO BOX (MATCHING FILTER CONTAINER STYLE)
+   ================================================ */
 .info-box {
-    background: white;
+    background: var(--bg-white);
     padding: 20px 25px;
     border-radius: 8px;
     border-left: 4px solid var(--primary-green-dark);
     margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .info-box h4 {
@@ -246,15 +280,20 @@ body {
     margin-bottom: 6px;
 }
 
-/* --- Form Card - MATCH DASHBOARD TABLE CONTAINER EXACTLY --- */
+/* ================================================
+   FORM CARD (MATCHING TABLE CONTAINER)
+   ================================================ */
 .form-card {
-    background: white;
+    background: var(--bg-white);
     padding: 25px;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     margin-bottom: 30px;
 }
 
+/* ================================================
+   FORM GROUPS (MATCHING FILTER STYLE)
+   ================================================ */
 .form-group {
     margin-bottom: 20px;
 }
@@ -268,7 +307,7 @@ body {
 }
 
 .required {
-    color: #dc3545;
+    color: var(--critical-color);
     margin-left: 3px;
 }
 
@@ -277,7 +316,7 @@ body {
 .form-group textarea {
     width: 100%;
     padding: 10px 12px;
-    border: 2px solid #e1e8ed;
+    border: 2px solid var(--border-light);
     border-radius: 6px;
     font-size: 14px;
     transition: all 0.3s ease;
@@ -298,15 +337,20 @@ body {
 
 .help-text {
     font-size: 12px;
-    color: #6c757d;
+    color: var(--text-muted);
     margin-top: 6px;
     display: block;
     font-style: italic;
 }
 
-/* --- Tags Section --- */
+/* ================================================
+   TAGS SECTION
+   ================================================ */
 .tags-section {
     margin-bottom: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
 }
 
 .tags-section h3 {
@@ -317,12 +361,12 @@ body {
 }
 
 .tags-section .help-text {
-    margin-bottom: 12px;
+    margin-bottom: 15px;
 }
 
 .tags-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 10px;
 }
 
@@ -340,14 +384,15 @@ body {
 .tag-label {
     display: flex;
     align-items: center;
-    padding: 8px 12px;
-    border: 2px solid #e1e8ed;
+    padding: 10px 14px;
+    border: 2px solid var(--border-light);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 13px;
     font-weight: 500;
     gap: 8px;
+    background: white;
 }
 
 .tag-checkbox input[type="checkbox"]:checked + .tag-label {
@@ -369,14 +414,16 @@ body {
     flex-shrink: 0;
 }
 
-/* --- File Upload --- */
+/* ================================================
+   FILE UPLOAD
+   ================================================ */
 .file-upload-group {
     margin-bottom: 20px;
 }
 
 .file-upload-group input[type="file"] {
     padding: 10px;
-    border: 2px dashed #e1e8ed;
+    border: 2px dashed var(--border-light);
     border-radius: 6px;
     font-size: 13px;
     cursor: pointer;
@@ -388,7 +435,9 @@ body {
     background: #f8f9ff;
 }
 
-/* --- Checkbox Group --- */
+/* ================================================
+   CHECKBOX GROUP
+   ================================================ */
 .checkbox-group {
     display: flex;
     align-items: center;
@@ -412,67 +461,66 @@ body {
     margin: 0;
 }
 
-/* --- Submit Section --- */
+/* ================================================
+   SUBMIT SECTION
+   ================================================ */
 .submit-section {
     display: flex;
     gap: 15px;
     align-items: center;
     padding-top: 10px;
-    flex-wrap: wrap;
+    flex-direction: column;
 }
 
 .submit-section .help-text {
-    flex: 1;
     margin: 0;
-    min-width: 200px;
+    text-align: center;
 }
 
-/* --- Responsive Design --- */
+/* ================================================
+   RESPONSIVE DESIGN (MATCHING DASHBOARD)
+   ================================================ */
 @media (max-width: 768px) {
     .main-layout {
         flex-direction: column;
     }
-    
+
     .sidebar {
         width: 100%;
     }
-    
+
     .dashboard-content {
         padding: 15px;
     }
-    
+
     .top-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
     }
-    
+
     .header-buttons {
         width: 100%;
         justify-content: flex-start;
+        flex-wrap: wrap;
     }
-    
+
     .header-card,
     .form-card,
     .info-box {
         padding: 20px;
     }
-    
+
     .header-card h1 {
-        font-size: 20px;
+        font-size: 18px;
     }
-    
+
     .tags-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .submit-section {
-        flex-direction: column;
         align-items: stretch;
-    }
-    
-    .submit-section .help-text {
-        text-align: center;
     }
 }
 
@@ -480,25 +528,25 @@ body {
     .system-title {
         font-size: 18px;
     }
-    
+
     .welcome-text {
         font-size: 16px;
     }
-    
+
     .button {
         padding: 8px 16px;
         font-size: 13px;
     }
-    
+
     .btn-primary {
-        padding: 12px 24px;
-        font-size: 15px;
+        padding: 10px 20px;
+        font-size: 14px;
     }
-    
+
     .form-group label {
         font-size: 12px;
     }
-    
+
     .form-group input,
     .form-group select,
     .form-group textarea {
