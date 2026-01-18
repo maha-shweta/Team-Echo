@@ -97,7 +97,7 @@ $trending_topics = array_slice($all_keywords, 0, 20, true);
         <nav class="sidebar-nav">
             <a href="../user/user_dashboard.php" class="nav-link">Dashboard</a>
             <a href="../feedback/submit_feedback.php" class="nav-link">Submit Feedback</a>
-            <a href="../admin/analytics_dashboard.php" class="nav-link">Analytics</a>
+            <a href="analytics_dashboard.php" class="nav-link">Analytics</a>
             <a href="ai_analytics_dashboard.php" class="nav-link active">Team-Echo AI</a>
             <a href="../user/profile.php" class="nav-link">My Profile</a>
         </nav>
@@ -106,7 +106,7 @@ $trending_topics = array_slice($all_keywords, 0, 20, true);
     <div class="main-content">
         <header class="topbar">
             <div class="topbar-welcome">
-                <i class="fa fa-robot"></i> TeamEcho AI Analytics
+                 Welcome
             </div>
             <div class="topbar-actions">
                 <a href="../user/profile.php" class="topbar-btn">Profile</a>

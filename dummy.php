@@ -1,273 +1,266 @@
 <?php
-// D:\project imp\htdocs\Team-Echo\dashboard\ai_analytics_dashboard.php
 session_start();
-include('../db/db.php'); 
 
-if (!$conn) { die("Database connection failed."); }
-
-// --- 1. FILTER LOGIC ---
-$filter_cat = $_GET['category'] ?? '';
-$start_date = $_GET['start_date'] ?? '';
-$end_date = $_GET['end_date'] ?? '';
-$where_clauses = ["1=1"];
-
-if (!empty($start_date)) $where_clauses[] = "f.submitted_at >= '" . $conn->real_escape_string($start_date) . " 00:00:00'";
-if (!empty($end_date)) $where_clauses[] = "f.submitted_at <= '" . $conn->real_escape_string($end_date) . " 23:59:59'";
-if (!empty($filter_cat)) $where_clauses[] = "f.category_id = " . intval($filter_cat);
-
-$where_sql = implode(" AND ", $where_clauses);
-
-// --- 2. TREND & ALERT CALCULATIONS ---
-$current_week = $conn->query("SELECT COUNT(*) as total FROM feedback f WHERE f.submitted_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND $where_sql")->fetch_assoc()['total'];
-$prev_week = $conn->query("SELECT COUNT(*) as total FROM feedback f WHERE f.submitted_at >= DATE_SUB(NOW(), INTERVAL 14 DAY) AND f.submitted_at < DATE_SUB(NOW(), INTERVAL 7 DAY) AND $where_sql")->fetch_assoc()['total'];
-
-$diff = $current_week - $prev_week;
-$percent_change = ($prev_week > 0) ? round(($diff / $prev_week) * 100) : ($current_week * 100);
-
-// Thresholds
-$alert_threshold_volume = 50; 
-$volume_alert = ($percent_change >= $alert_threshold_volume);
-
-// --- 3. CHART DATA ---
-$total_mentions = $conn->query("SELECT COUNT(*) as total FROM feedback f WHERE $where_sql")->fetch_assoc()['total'];
-$neg_data = $conn->query("SELECT COUNT(*) as count FROM feedback f WHERE $where_sql AND sentiment_label = 'Negative'")->fetch_assoc()['count'];
-$neg_percent = $total_mentions > 0 ? round(($neg_data / $total_mentions) * 100) : 0;
-$sentiment_alert = ($neg_percent >= 25);
-
-// Chart Arrays
-$s_res = $conn->query("SELECT sentiment_label, COUNT(*) as count FROM feedback f WHERE $where_sql GROUP BY sentiment_label");
-$s_labels = []; $s_counts = [];
-while($r = $s_res->fetch_assoc()){ $s_labels[] = $r['sentiment_label']; $s_counts[] = $r['count']; }
-
-$line_res = $conn->query("SELECT DATE(f.submitted_at) as date, COUNT(*) as count FROM feedback f WHERE $where_sql GROUP BY DATE(f.submitted_at) ORDER BY date ASC LIMIT 7");
-$l_labels = []; $l_values = [];
-while($r = $line_res->fetch_assoc()){ $l_labels[] = date("M d", strtotime($r['date'])); $l_values[] = $r['count']; }
-
-// --- 4. TRENDING TOPICS / WORD CLOUD DATA FROM FEEDBACK TEXT ---
-function extractKeywords($text) {
-    // Common stop words to filter out
-    $stopWords = ['the', 'is', 'at', 'which', 'on', 'a', 'an', 'as', 'are', 'was', 'were', 
-                  'been', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would',
-                  'could', 'should', 'may', 'might', 'can', 'to', 'of', 'in', 'for', 'with',
-                  'and', 'or', 'but', 'not', 'this', 'that', 'by', 'from', 'it', 'its'];
-    
-    // Convert to lowercase and remove special characters
-    $text = strtolower($text);
-    $text = preg_replace('/[^a-z0-9\s]/', ' ', $text);
-    
-    // Split into words
-    $words = preg_split('/\s+/', $text);
-    
-    // Filter out stop words and short words
-    $keywords = array_filter($words, function($word) use ($stopWords) {
-        return strlen($word) > 3 && !in_array($word, $stopWords);
-    });
-    
-    return $keywords;
+// --- START: ORIGINAL BACKEND LOGIC (UNTOUCHED) ---
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../user/login.php');
+    exit;
 }
 
-// Get all feedback text for trending topics
-$trending_query = "SELECT feedback_text FROM feedback f WHERE $where_sql";
-$trending_result = $conn->query($trending_query);
+include('../db/db.php');
 
-$all_keywords = [];
-while($row = $trending_result->fetch_assoc()) {
-    $keywords = extractKeywords($row['feedback_text']);
-    foreach($keywords as $word) {
-        if(isset($all_keywords[$word])) {
-            $all_keywords[$word]++;
-        } else {
-            $all_keywords[$word] = 1;
-        }
-    }
+$total_feedback = $conn->query("SELECT COUNT(*) as count FROM feedback")->fetch_assoc()['count'];
+$resolved_feedback = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE is_resolved = 1")->fetch_assoc()['count'];
+$unresolved_feedback = $total_feedback - $resolved_feedback;
+$total_categories = $conn->query("SELECT COUNT(*) as count FROM category")->fetch_assoc()['count'];
+$total_users = $conn->query("SELECT COUNT(*) as count FROM management_user")->fetch_assoc()['count'];
+
+$category_sql = "SELECT c.category_name, COUNT(f.feedback_id) as count 
+                 FROM category c
+                 LEFT JOIN feedback f ON c.category_id = f.category_id
+                 GROUP BY c.category_id, c.category_name
+                 ORDER BY count DESC
+                 LIMIT 10";
+$category_result = $conn->query($category_sql);
+
+$category_labels = []; $category_data = [];
+while ($row = $category_result->fetch_assoc()) {
+    $category_labels[] = $row['category_name'];
+    $category_data[] = $row['count'];
 }
 
-// Sort by frequency and get top 20
-arsort($all_keywords);
-$trending_topics = array_slice($all_keywords, 0, 20, true);
+$timeline_sql = "SELECT DATE(submitted_at) as date, COUNT(*) as count 
+                 FROM feedback 
+                 WHERE submitted_at >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+                 GROUP BY DATE(submitted_at)
+                 ORDER BY date ASC";
+$timeline_result = $conn->query($timeline_sql);
+
+$timeline_labels = []; $timeline_data = [];
+while ($row = $timeline_result->fetch_assoc()) {
+    $timeline_labels[] = date('M d', strtotime($row['date']));
+    $timeline_data[] = $row['count'];
+}
+
+$resolution_sql = "SELECT c.category_name,
+                   COUNT(f.feedback_id) as total,
+                   SUM(CASE WHEN f.is_resolved = 1 THEN 1 ELSE 0 END) as resolved
+                   FROM category c
+                   LEFT JOIN feedback f ON c.category_id = f.category_id
+                   GROUP BY c.category_id, c.category_name
+                   HAVING total > 0
+                   ORDER BY c.category_name";
+$resolution_result = $conn->query($resolution_sql);
+
+$resolution_labels = []; $resolution_rates = []; $res_raw_ok = []; $res_raw_pending = [];
+while ($row = $resolution_result->fetch_assoc()) {
+    $resolution_labels[] = $row['category_name'];
+    $rate = ($row['total'] > 0) ? round(($row['resolved'] / $row['total']) * 100, 1) : 0;
+    $resolution_rates[] = $rate;
+    $res_raw_ok[] = $row['resolved'];
+    $res_raw_pending[] = $row['total'] - $row['resolved'];
+}
+$conn->close();
+// --- END: ORIGINAL BACKEND LOGIC ---
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AI Analytics Dashboard</title>
-    <link rel="stylesheet" href="ai_analytics_dashboard.css">
+    <title>Screen-Fit Analytics | Team Echo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .word-cloud-container {
+        :root { --primary: #0C4F3B; --accent: #1eb386; --bg: #f3f6f5; }
+        
+        /* Force no scroll and fix height to screen */
+        html, body { 
+            height: 100vh; 
+            width: 100vw; 
+            margin: 0; 
+            padding: 0; 
+            overflow: hidden; 
+            background: var(--bg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .container { 
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
+            height: 100vh;
+            padding: 15px 25px;
+            box-sizing: border-box;
+        }
+
+        .dashboard-head { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            height: 40px;
+            margin-bottom: 10px;
+        }
+        .dashboard-head h1 { font-size: 18px; color: var(--primary); font-weight: 800; }
+
+        /* Metric Tiles - Small and Fixed */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 15px; 
+            height: 80px;
+            margin-bottom: 15px;
+        }
+        .card { 
+            background: white; 
+            padding: 10px 15px; 
+            border-radius: 12px; 
+            border: 1px solid #eef1f0;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
-            align-items: center;
-            gap: 15px;
-            padding: 20px;
-            min-height: 250px;
         }
+        .card p { font-size: 9px; color: #718096; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; font-weight: 800; }
+        .card h2 { font-size: 20px; color: var(--primary); margin: 0; }
+
+        /* Charts Layout - Occupies remaining 100vh space */
+        .charts-container { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+            flex-grow: 1; /* Fills remaining space */
+            padding-bottom: 10px;
+        }
+        .chart-box { 
+            background: white; 
+            padding: 12px; 
+            border-radius: 16px; 
+            border: 1px solid #eef1f0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chart-box h3 { font-size: 12px; margin-bottom: 8px; color: #4a5568; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .chart-box h3::before { content: ''; width: 3px; height: 12px; background: var(--accent); border-radius: 4px; }
         
-        .word-item {
-            display: inline-block;
-            padding: 8px 16px;
-            margin: 5px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            cursor: pointer;
+        .chart-wrapper { 
+            flex-grow: 1; /* Makes the canvas expand to fill the card */
+            position: relative; 
+            width: 100%;
         }
-        
-        .word-item:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        
-        .no-data-message {
-            text-align: center;
-            color: #999;
-            font-size: 14px;
-            padding: 40px;
-        }
+
+        .btn-exit { font-size: 11px; color: var(--primary); font-weight: 700; text-decoration: none; border: 1px solid var(--primary); padding: 5px 10px; border-radius: 8px; }
     </style>
 </head>
 <body>
 
-<div class="top-nav">
-    <div class="nav-brand"><i class="fa fa-robot"></i> TeamEcho AI</div>
-    <form class="filter-form" method="GET">
-        <input type="date" name="start_date" value="<?php echo $start_date; ?>">
-        <input type="date" name="end_date" value="<?php echo $end_date; ?>">
-        <select name="category">
-            <option value="">Categories</option>
-            <?php 
-            $cats = $conn->query("SELECT * FROM category");
-            while($c = $cats->fetch_assoc()) {
-                $sel = ($filter_cat == $c['category_id']) ? 'selected' : '';
-                echo "<option value='{$c['category_id']}' $sel>{$c['category_name']}</option>";
-            }
-            ?>
-        </select>
-        <button type="submit" class="filter-btn">Filter</button>
-        <a href="ai_analytics_dashboard.php" class="reset-link">Reset</a>
-    </form>
-</div>
-
-<div class="dashboard-layout">
-    <div class="sidebar-metrics">
-        <div class="metric-box">
-            <div class="metric-label">System Health</div>
-            <div class="metric-value" style="font-size: 16px; color: <?php echo ($volume_alert || $sentiment_alert) ? '#e74c3c' : '#2ecc71'; ?>;">
-                <i class="fa <?php echo ($volume_alert || $sentiment_alert) ? 'fa-exclamation-circle' : 'fa-check-circle'; ?>"></i>
-                <?php echo ($volume_alert || $sentiment_alert) ? 'Attention Needed' : 'All Stable'; ?>
-            </div>
-        </div>
-
-        <div class="metric-box">
-            <div class="metric-label">Mentions Trend</div>
-            <div class="metric-value">
-                <?php echo number_format($total_mentions); ?>
-                <span class="trend-badge" style="color:<?php echo ($diff >= 0) ? '#2ecc71' : '#e74c3c'; ?>;">
-                    <i class="fa <?php echo ($diff >= 0) ? 'fa-caret-up' : 'fa-caret-down'; ?>"></i> <?php echo abs($percent_change); ?>%
-                </span>
-            </div>
-        </div>
-
-        <div class="metric-box">
-            <div class="metric-label">Dept. Heatmap</div>
-            <?php
-            $h_res = $conn->query("SELECT c.category_name, AVG(f.sentiment_score) as avg FROM feedback f JOIN category c ON f.category_id = c.category_id WHERE $where_sql GROUP BY c.category_id");
-            if($h_res && $h_res->num_rows > 0):
-                while($h = $h_res->fetch_assoc()):
-                    $avg_score = $h['avg'] ?? 0;
-                    $bg = ($avg_score < -0.1) ? '#f8d7da' : (($avg_score > 0.1) ? '#d4edda' : '#fff');
-                ?>
-                <div class="heatmap-item" style="background:<?php echo $bg; ?>;"><?php echo $h['category_name']; ?> <strong><?php echo round($avg_score, 1); ?></strong></div>
-                <?php endwhile;
-            else: ?>
-                <div class="no-data-message">No data available</div>
-            <?php endif; ?>
-        </div>
+<div class="container">
+    <div class="dashboard-head">
+        <h1>Feedback Intelligence</h1>
+        <a href="admin_dashboard.php" class="btn-exit">← Exit</a>
     </div>
 
-    <div class="main-charts">
-        <div class="card <?php echo $sentiment_alert ? 'alert-active' : ''; ?>">
-            <div class="card-title">Sentiment Ratio</div>
-            <div class="chart-container"><canvas id="sentimentChart"></canvas></div>
+    <div class="stats-grid">
+        <div class="card"><p>Inflow</p><h2><?php echo $total_feedback; ?></h2></div>
+        <div class="card"><p>Resolved</p><h2 style="color: var(--accent);"><?php echo $resolved_feedback; ?></h2></div>
+        <div class="card"><p>Pending</p><h2 style="color: #e53e3e;"><?php echo $unresolved_feedback; ?></h2></div>
+        <div class="card"><p>Close Rate</p><h2><?php echo ($total_feedback > 0) ? round(($resolved_feedback/$total_feedback)*100) : 0; ?>%</h2></div>
+    </div>
+
+    <div class="charts-container">
+        <div class="chart-box">
+            <h3>Submission Velocity</h3>
+            <div class="chart-wrapper"><canvas id="lineChart"></canvas></div>
         </div>
 
-        <div class="card <?php echo $volume_alert ? 'alert-active' : ''; ?>">
-            <div class="card-title">
-                <span>Volume Trends</span>
-                <div class="card-summary">
-                    <span class="summary-value"><?php echo $current_week; ?></span>
-                    <span class="summary-trend" style="color:<?php echo ($diff >= 0) ? '#2ecc71' : '#e74c3c'; ?>;">
-                        <i class="fa <?php echo ($diff >= 0) ? 'fa-caret-up' : 'fa-caret-down'; ?>"></i> <?php echo abs($percent_change); ?>%
-                    </span>
-                </div>
-            </div>
-            <div class="chart-container"><canvas id="lineChart"></canvas></div>
+        <div class="chart-box">
+            <h3>Volume by Category</h3>
+            <div class="chart-wrapper"><canvas id="categoryBarChart"></canvas></div>
         </div>
 
-        <div class="card word-cloud-wide">
-            <div class="card-title">Trending Topics (from Feedback)</div>
-            <div class="word-cloud-container">
-                <?php 
-                if(!empty($trending_topics)) {
-                    $max_count = max($trending_topics);
-                    $min_count = min($trending_topics);
-                    
-                    foreach($trending_topics as $word => $count) {
-                        // Calculate font size based on frequency (12px to 28px)
-                        $size = 12 + (($count - $min_count) / max(1, ($max_count - $min_count))) * 16;
-                        echo "<span class='word-item' style='font-size: {$size}px;' title='Mentioned $count times'>" . 
-                             htmlspecialchars($word) . " <small>($count)</small></span>";
-                    }
-                } else {
-                    echo "<div class='no-data-message'>No feedback data available for trending topics</div>";
-                }
-                ?>
-            </div>
+        <div class="chart-box">
+            <h3>Resolution Progress</h3>
+            <div class="chart-wrapper"><canvas id="stackedBarChart"></canvas></div>
+        </div>
+
+        <div class="chart-box">
+            <h3>Success % per Category</h3>
+            <div class="chart-wrapper"><canvas id="resolutionRateChart"></canvas></div>
         </div>
     </div>
 </div>
 
 <script>
-// Sentiment Chart
-new Chart(document.getElementById('sentimentChart'), {
-    type: 'doughnut',
-    data: {
-        labels: <?php echo json_encode($s_labels); ?>,
-        datasets: [{ data: <?php echo json_encode($s_counts); ?>, backgroundColor: ['#2ecc71', '#e74c3c', '#f1c40f'], borderWidth: 0 }]
-    },
-    options: { cutout: '80%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } },
-    plugins: [{
-        id: 'centerText',
-        afterDraw: (chart) => {
-            const { ctx, chartArea: { left, top, width, height } } = chart;
-            ctx.save(); ctx.textAlign = 'center';
-            ctx.font = 'bold 22px sans-serif'; ctx.fillStyle = '#1a2b49';
-            ctx.fillText('<?php echo $total_mentions; ?>', left + width / 2, top + height / 2 + 5);
-            ctx.font = 'bold 11px sans-serif'; ctx.fillStyle = '<?php echo $sentiment_alert ? "#e74c3c" : "#888"; ?>';
-            ctx.fillText('NEG: <?php echo $neg_percent; ?>%', left + width / 2, top + height / 2 + 25);
-            ctx.restore();
-        }
-    }]
-});
+    // Universal Chart Settings
+    Chart.defaults.font.size = 10;
+    Chart.defaults.color = '#718096';
 
-// Line Chart
-new Chart(document.getElementById('lineChart'), {
-    type: 'line',
-    data: {
-        labels: <?php echo json_encode($l_labels); ?>,
-        datasets: [{ data: <?php echo json_encode($l_values); ?>, borderColor: '#0099cc', borderWidth: 2, tension: 0.4, fill: true, backgroundColor: 'rgba(0,153,204,0.05)', pointRadius: 0 }]
-    },
-    options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { size: 10 } } } }
-    }
-});
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false, // Essential for matching screen height
+        plugins: { legend: { display: false } }
+    };
+
+    // 1. Line Chart
+    new Chart(document.getElementById('lineChart'), {
+        type: 'line',
+        data: {
+            labels: <?php echo json_encode($timeline_labels); ?>,
+            datasets: [{
+                data: <?php echo json_encode($timeline_data); ?>,
+                borderColor: '#0C4F3B',
+                backgroundColor: 'rgba(12, 79, 59, 0.05)',
+                fill: true, tension: 0.4, borderWidth: 2, pointRadius: 1
+            }]
+        },
+        options: chartOptions
+    });
+
+    // 2. Horizontal Bar
+    new Chart(document.getElementById('categoryBarChart'), {
+        type: 'bar',
+        data: {
+            labels: <?php echo json_encode($category_labels); ?>,
+            datasets: [{ data: <?php echo json_encode($category_data); ?>, backgroundColor: '#1eb386', borderRadius: 4 }]
+        },
+        options: { ...chartOptions, indexAxis: 'y' }
+    });
+
+    // 3. Stacked Bar
+    new Chart(document.getElementById('stackedBarChart'), {
+        type: 'bar',
+        data: {
+            labels: <?php echo json_encode(array_slice($resolution_labels, 0, 5)); ?>,
+            datasets: [
+                { label: 'Resolved', data: <?php echo json_encode(array_slice($res_raw_ok, 0, 5)); ?>, backgroundColor: '#0C4F3B' },
+                { label: 'Pending', data: <?php echo json_encode(array_slice($res_raw_pending, 0, 5)); ?>, backgroundColor: '#edf2f7' }
+            ]
+        },
+        options: { 
+            ...chartOptions, 
+            scales: { x: { stacked: true }, y: { stacked: true } },
+            plugins: { legend: { display: true, position: 'bottom', labels: { boxWidth: 8 } } }
+        }
+    });
+
+    // 4. Rate Line
+    new Chart(document.getElementById('resolutionRateChart'), {
+        type: 'line',
+        data: {
+            labels: <?php echo json_encode($resolution_labels); ?>,
+            datasets: [{
+                data: <?php echo json_encode($resolution_rates); ?>,
+                borderColor: '#1eb386',
+                borderDash: [4, 4],
+                pointBackgroundColor: '#0C4F3B',
+                fill: false,
+                tension: 0.1
+            }]
+        },
+        options: { 
+            ...chartOptions, 
+            scales: { y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } } 
+        }
+    });
 </script>
 </body>
 </html>

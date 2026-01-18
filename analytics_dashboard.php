@@ -81,22 +81,11 @@ $conn->close();
     <aside class="sidebar">
         <div class="sidebar-header">Feedback System</div>
         <nav class="sidebar-nav">
-            <a href="admin_dashboard.php" class="nav-link">Dashboard</a>
-            <a href="manage_users.php" class="nav-item">Manage Users</a>
-            <a href="../category/manage_category.php" class="nav-item">Manage Categories</a>
-            <a href="manage_tags.php" class="nav-item">Manage Tags</a>
-            <a href="analytics_dashboard.php" class="nav-item active">Analytics</a>
-            <a href="../admin/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
-             <a href="../feedback/export_feedback.php<?php 
-                $params = [];
-                if (!empty($category_filter)) $params[] = 'category=' . $category_filter;
-                if ($status_filter !== '') $params[] = 'status=' . $status_filter;
-                if (!empty($priority_filter)) $params[] = 'priority=' . $priority_filter;
-                if (!empty($search_query)) $params[] = 'search=' . urlencode($search_query);
-                if (!empty($date_from)) $params[] = 'date_from=' . $date_from;
-                if (!empty($date_to)) $params[] = 'date_to=' . $date_to;
-                echo !empty($params) ? '?' . implode('&', $params) : '';
-            ?>" class="nav-item">Export Feedback</a>
+            <a href="../user/user_dashboard.php" class="nav-link">Dashboard</a>
+            <a href="../feedback/submit_feedback.php" class="nav-link">Submit Feedback</a>
+            <a href="analytics_dashboard.php" class="nav-link active">Analytics</a>
+            <a href="ai_analytics_dashboard.php" class="nav-link">Team-Echo AI</a>
+            <a href="../user/profile.php" class="nav-link">My Profile</a>
         </nav>
     </aside>
 

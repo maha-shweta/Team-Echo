@@ -1,0 +1,31 @@
+To run your AI sentiment analysis script (nltk_engine.py) so it can process your database feedback, follow these precise steps.
+
+1. Install Python and Required Libraries
+Before the script can talk to your MySQL database or perform AI analysis, you must install the necessary "engines.".
+
+Open your Command Prompt (cmd) or Terminal.
+
+Type the following command and press Enter: pip install textblob mysql-connector-python.
+
+Crucial for TextBlob: You also need to download the English language corpora by running this command: python -m textblob.download_corpora
+
+2. Navigate to your Project Folder
+You need to tell your computer exactly where the file is located. Based on your folder structure:
+
+In your terminal, type D: and press Enter (to switch to your D drive).
+
+Navigate to your sentiment folder: cd "D:\project imp\htdocs\Team-Echo\sentiment"
+
+3. Execute the Script
+Now, run the script to start the analysis process:
+
+Type the following and press Enter: python nltk_engine.py
+
+4. Verify the Results in MySQL
+Once the script says "Analysis Complete," go to phpMyAdmin to see the "AI" in action:
+
+Open your team_echo_new database.
+
+Open the feedback table.
+
+Check the sentiment_label column. It should no longer be NULL; it will now show Positive, Negative, or Neutral based on the feedback_text..
