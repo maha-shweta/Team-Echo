@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once('../config.php');
 
 // Ensure only logged-in users can access this page
 if (!isset($_SESSION['user_id'])) {
@@ -22,8 +23,8 @@ $status_filter = isset($_GET['status']) ? $_GET['status'] : '';
 $columns_check = $conn->query("SHOW COLUMNS FROM feedback LIKE 'user_id'");
 $has_user_id = ($columns_check->num_rows > 0);
 
-// Build SQL query with filters (all anonymous feedback with tags and priority)
-$sql = "SELECT f.feedback_id, f.feedback_text, f.submitted_at, c.category_name, f.is_resolved, f.priority,
+// Build SQL query with filters (all anonymous feedback with tags, priority, and sentiment)
+$sql = "SELECT f.feedback_id, f.feedback_text, f.submitted_at, c.category_name, f.is_resolved, f.priority, f.sentiment_label,
         (SELECT GROUP_CONCAT(t.tag_name SEPARATOR ', ') FROM feedback_tags ft JOIN tags t ON ft.tag_id = t.tag_id WHERE ft.feedback_id = f.feedback_id) as tags,
         (SELECT GROUP_CONCAT(t.tag_color SEPARATOR ',') FROM feedback_tags ft JOIN tags t ON ft.tag_id = t.tag_id WHERE ft.feedback_id = f.feedback_id) as tag_colors,
         (SELECT COUNT(*) FROM feedback_comments WHERE feedback_id = f.feedback_id AND is_internal = 0) as comment_count";
@@ -101,6 +102,7 @@ if ($has_user_id) {
     <link rel="stylesheet" href="user_dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
 
 <div class="main-layout">
@@ -111,6 +113,7 @@ if ($has_user_id) {
             <a href="user_dashboard.php" class="nav-item active">Dashboard</a>
             <a href="../feedback/submit_feedback.php" class="nav-item">Submit Feedback</a>
             <a href="../admin/analytics_dashboard.php" class="nav-item">Analytics</a>
+            <a href="ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
             <a href="profile.php" class="nav-item">My Profile</a>
         </nav>
     </aside>
@@ -142,7 +145,7 @@ if ($has_user_id) {
 
             <!-- Quick Action Button -->
             <div style="margin-bottom: 25px;">
-                <a href="../feedback/submit_feedback.php" class="button btn-success" style="font-size: 15px; padding: 12px 25px;">
+                <a href="../feedback/submit_feedback.php" class="button btn-success" style="font-size: 15px; padding: 12px 25px; background-color: #0C4F3B;">
                     Submit New Feedback
                 </a>
             </div>
@@ -258,7 +261,7 @@ if ($has_user_id) {
                     <div class="filter-buttons">
                         <button type="submit" class="button btn-primary">Apply Filters</button>
                         <a href="user_dashboard.php?view=<?php echo $view_mode; ?>" 
-                           class="button btn-success">Clear Filters</a>
+                           class="button btn-success" style="background-color: white; color: #0C4F3B;border: 1px solid #0C4F3B;">Clear Filters</a>
                     </div>
                 </form>
             </div>
@@ -277,6 +280,7 @@ if ($has_user_id) {
                             <th>ID</th>
                             <th>Priority</th>
                             <th>Category</th>
+                            <th>Sentiment</th>
                             <th>Feedback</th>
                             <th>Tags</th>
                             <th>Submitted</th>
@@ -314,6 +318,15 @@ if ($has_user_id) {
                                 </span>
                             </td>
                             <td><?php echo htmlspecialchars($row['category_name']); ?></td>
+                            <td>
+                                <?php 
+                                $sentiment = $row['sentiment_label'] ?? 'Pending';
+                                $sentiment_class = strtolower($sentiment);
+                                ?>
+                                <span class="sentiment-badge sentiment-<?php echo $sentiment_class; ?>">
+                                    <?php echo htmlspecialchars($sentiment); ?>
+                                </span>
+                            </td>
                             <td>
                                 <?php 
                                 echo htmlspecialchars(substr($row['feedback_text'], 0, 80)) 
@@ -385,6 +398,27 @@ if ($has_user_id) {
         </main>
     </div>
 </div>
+
+
+<?php include('../includes/chatbot.php'); ?>
+
+<script>
+(function() {
+    const base = '/team_echo';
+    document.querySelectorAll('a[href]').forEach(a => {
+        let h = a.getAttribute('href');
+        if (h.startsWith('../user/')) a.href = base + '/user/' + h.split('/').pop();
+        else if (h.startsWith('../feedback/')) a.href = base + '/feedback/' + h.split('/').pop();
+        else if (h.startsWith('../admin/')) a.href = base + '/admin/' + h.split('/').pop();
+        else if (h.startsWith('../hr/')) a.href = base + '/hr/' + h.split('/').pop();
+        else if (h.startsWith('../dashboard/')) a.href = base + '/dashboard/' + h.split('/').pop();
+        else if (h === 'user_dashboard.php') a.href = base + '/user/user_dashboard.php';
+        else if (h === 'profile.php') a.href = base + '/user/profile.php';
+        else if (h === 'logout.php') a.href = base + '/user/logout.php';
+        else if (h === 'ai_analytics_dashboard.php') a.href = base + '/user/ai_analytics_dashboard.php';
+    });
+})();
+</script>
 
 </body>
 </html>

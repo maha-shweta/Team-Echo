@@ -74,252 +74,132 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            max-width: 600px;
-            width: 100%;
-            padding: 40px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .header .icon {
-            font-size: 64px;
-            margin-bottom: 15px;
-        }
-        
-        .header h2 {
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            color: #6c757d;
-            font-size: 14px;
-        }
-        
-        .message {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
-        }
-        
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
-        
-        .info-box {
-            background: #e7f3ff;
-            border-left: 4px solid #0066cc;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .info-box h4 {
-            font-size: 14px;
-            color: #0066cc;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        
-        .info-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 0;
-            font-size: 13px;
-            color: #333;
-            border-bottom: 1px solid rgba(0, 102, 204, 0.1);
-        }
-        
-        .info-item:last-child {
-            border-bottom: none;
-        }
-        
-        .info-item span:first-child {
-            font-weight: 600;
-            color: #0066cc;
-        }
-        
-        form {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        
-        label {
-            display: block;
-            margin-top: 15px;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #333;
-            font-size: 14px;
-        }
-        
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e8ed;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        input[type="submit"] {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-top: 20px;
-            font-weight: 600;
-            transition: transform 0.3s ease;
-        }
-        
-        input[type="submit"]:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .btn {
-            flex: 1;
-            padding: 12px 20px;
-            border-radius: 6px;
-            text-decoration: none;
-            text-align: center;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-warning {
-            background: #ffc107;
-            color: #000;
-        }
-        
-        .btn-warning:hover {
-            background: #e0a800;
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-        
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            background: #667eea;
-            color: white;
-        }
-    </style>
+    <title>My Profile - Anonymous Feedback System</title>
+    <link rel="stylesheet" href="profile.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <div class="icon">👤</div>
-        <h2>My Profile</h2>
-        <p>Manage your account information</p>
-    </div>
-    
-    <?php if (isset($success_message)): ?>
-        <div class="message success">✅ <?php echo htmlspecialchars($success_message); ?></div>
-    <?php endif; ?>
+<div class="main-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="system-title">Feedback System</div>
+        <nav class="nav-menu">
+            <?php if ($_SESSION['role'] == 'admin'): ?>
+                <a href="../admin/admin_dashboard.php" class="nav-item">Dashboard</a>
+                <a href="../admin/manage_users.php" class="nav-item">Manage Users</a>
+                <a href="../admin/manage_categories.php" class="nav-item">Categories</a>
+                <a href="../admin/manage_tags.php" class="nav-item">Tags</a>
+                <a href="../admin/analytics_dashboard.php" class="nav-item">Analytics</a>
+                <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+            <?php elseif ($_SESSION['role'] == 'hr'): ?>
+                <a href="../hr/hr_dashboard.php" class="nav-item">Dashboard</a>
+                <a href="../admin/analytics_dashboard.php" class="nav-item">Analytics</a>
+                <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+            <?php else: ?>
+                <a href="user_dashboard.php" class="nav-item">Dashboard</a>
+                <a href="../feedback/submit_feedback.php" class="nav-item">Submit Feedback</a>
+                <a href="../admin/analytics_dashboard.php" class="nav-item">Analytics</a>
+                <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+            <?php endif; ?>
+            <a href="profile.php" class="nav-item active">My Profile</a>
+        </nav>
+    </aside>
 
-    <?php if (isset($error_message)): ?>
-        <div class="message error">❌ <?php echo htmlspecialchars($error_message); ?></div>
-    <?php endif; ?>
+    <!-- Main Content Area -->
+    <div class="content-area">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="welcome-text">Welcome, <?php echo htmlspecialchars($_SESSION['name']); ?></div>
+            <div class="header-buttons">
+                <a href="profile.php" class="btn-header">Profile</a>
+                <a href="logout.php" class="logout-btn">Logout</a>
+            </div>
+        </header>
 
-    <div class="info-box">
-        <h4>📊 Account Information</h4>
-        <div class="info-item">
-            <span>User ID:</span>
-            <span>#<?php echo htmlspecialchars($user['user_id']); ?></span>
-        </div>
-        <div class="info-item">
-            <span>Role:</span>
-            <span class="badge"><?php echo htmlspecialchars(ucfirst($user['role'])); ?></span>
-        </div>
-        <div class="info-item">
-            <span>Member Since:</span>
-            <span><?php echo date('M d, Y', strtotime($user['created_at'])); ?></span>
-        </div>
-    </div>
+        <!-- Dashboard Content -->
+        <main class="dashboard-content">
+            <div class="container">
+                <!-- Header -->
+                <div class="header-card">
+                    <h1>My Profile</h1>
+                    <p>Manage your account information and update your personal details.</p>
+                </div>
 
-    <form method="POST" action="">
-        <label for="name">Full Name *</label>
-        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($user['name']); ?>" required>
+                <!-- Messages -->
+                <?php
+                if (isset($success_message)) {
+                    echo '<div class="message success">✓ ' . htmlspecialchars($success_message) . '</div>';
+                }
+                if (isset($error_message)) {
+                    echo '<div class="message error">✗ ' . htmlspecialchars($error_message) . '</div>';
+                }
+                ?>
 
-        <label for="email">Email Address *</label>
-        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                <!-- Back Button -->
+                <?php
+                // Dynamic back link based on role
+                if ($_SESSION['role'] == 'admin') {
+                    echo '<a href="../admin/admin_dashboard.php" class="button btn-back">← Back to Dashboard</a>';
+                } elseif ($_SESSION['role'] == 'hr') {
+                    echo '<a href="../hr/hr_dashboard.php" class="button btn-back">← Back to Dashboard</a>';
+                } else {
+                    echo '<a href="user_dashboard.php" class="button btn-back">← Back to Dashboard</a>';
+                }
+                ?>
 
-        <input type="submit" value="💾 Update Profile">
-    </form>
+                <!-- Account Info Box -->
+                <div class="info-box">
+                    <h4>Account Information</h4>
+                    <div class="info-item">
+                        <span>User ID:</span>
+                        <span>#<?php echo htmlspecialchars($user['user_id']); ?></span>
+                    </div>
+                    <div class="info-item">
+                        <span>Role:</span>
+                        <span class="badge"><?php echo htmlspecialchars(ucfirst($user['role'])); ?></span>
+                    </div>
+                    <div class="info-item">
+                        <span>Member Since:</span>
+                        <span><?php echo date('M d, Y', strtotime($user['created_at'])); ?></span>
+                    </div>
+                </div>
 
-    <div class="button-group">
-        <a href="change_password.php" class="btn btn-warning">🔒 Change Password</a>
-        <?php
-        // Dynamic back link based on role
-        if ($_SESSION['role'] == 'admin') {
-            echo '<a href="../admin/admin_dashboard.php" class="btn btn-secondary">← Back</a>';
-        } elseif ($_SESSION['role'] == 'hr') {
-            echo '<a href="../hr/hr_dashboard.php" class="btn btn-secondary">← Back</a>';
-        } else {
-            echo '<a href="user_dashboard.php" class="btn btn-secondary">← Back</a>';
-        }
-        ?>
+                <!-- Profile Form -->
+                <div class="form-card">
+                    <form method="POST" action="">
+                        <div class="form-group">
+                            <label for="name">Full Name <span class="required">*</span></label>
+                            <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($user['name']); ?>" required>
+                            <span class="help-text">Enter your full name as you'd like it to appear</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                            <span class="help-text">This email will be used for account-related communications</span>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Update Profile</button>
+                    </form>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="button-group">
+                    <a href="change_password.php" class="btn-warning">Change Password</a>
+                    <?php
+                    // Dynamic back link based on role
+                    if ($_SESSION['role'] == 'admin') {
+                        echo '<a href="../admin/admin_dashboard.php" class="btn-secondary">Back to Dashboard</a>';
+                    } elseif ($_SESSION['role'] == 'hr') {
+                        echo '<a href="../hr/hr_dashboard.php" class="btn-secondary">Back to Dashboard</a>';
+                    } else {
+                        echo '<a href="user_dashboard.php" class="btn-secondary">Back to Dashboard</a>';
+                    }
+                    ?>
+                </div>
+            </div>
+        </main>
     </div>
 </div>
 

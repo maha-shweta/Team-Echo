@@ -1,0 +1,406 @@
+/* ================================================
+   ANALYTICS DASHBOARD CSS - UNIFIED DESIGN
+   ================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f5f7f8;
+}
+
+/* ================================================
+   COLOR VARIABLES
+   ================================================ */
+:root {
+    --primary-green-dark: #0c4f3b; 
+    --accent-green-light: #32b25e;
+    --pending-color: #f39c12;
+    --critical-color: #dc3545;
+    --high-priority-color: #fd7e14;
+    --text-dark: #333;
+    --text-muted: #6c757d;
+    --border-light: #e1e8ed;
+    --bg-white: #ffffff;
+}
+
+/* ================================================
+   LAYOUT STRUCTURE
+   ================================================ */
+.main-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ================================================
+   SIDEBAR
+   ================================================ */
+.sidebar {
+    width: 240px;
+    background-color: var(--bg-white);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+    padding: 20px 0;
+    flex-shrink: 0;
+}
+
+.system-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary-green-dark);
+    padding: 0 20px 30px 20px;
+}
+
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-item {
+    padding: 12px 20px;
+    text-decoration: none;
+    color: #555;
+    font-size: 15px;
+    transition: background-color 0.2s, color 0.2s;
+    border-left: 5px solid transparent;
+}
+
+.nav-item.active {
+    background-color: #f0f8ff;
+    color: var(--primary-green-dark);
+    font-weight: 600;
+    border-left-color: var(--primary-green-dark);
+}
+
+.nav-item:hover:not(.active) {
+    background-color: #f9f9f9;
+}
+
+/* ================================================
+   MAIN CONTENT AREA
+   ================================================ */
+.content-area {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ================================================
+   TOP HEADER
+   ================================================ */
+.top-header {
+    background-color: var(--primary-green-dark);
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.welcome-text {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.logout-btn,
+.btn-header {
+    background-color: var(--primary-green-dark);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 8px 22px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.10);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.logout-btn:hover,
+.btn-header:hover {
+    background-color: #085826;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* ================================================
+   DASHBOARD CONTENT
+   ================================================ */
+.dashboard-content {
+    padding: 30px;
+    height: calc(100vh - 50px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    width: 100%;
+}
+
+/* ================================================
+   PAGE HEADER (UPDATED WITH FLEX LAYOUT)
+   ================================================ */
+.page-header {
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary-green-dark);
+    margin-bottom: 0;
+}
+
+.page-header p {
+    font-size: 15px;
+    color: #6c757d;
+    line-height: 1.5;
+}
+
+/* ================================================
+   BACK BUTTON (MATCHING MANAGE_USERS.CSS)
+   ================================================ */
+.btn-back {
+    background: white;
+    color: var(--primary-green-dark);
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 2px solid var(--border-light);
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin-bottom: 0;
+}
+
+.btn-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    border-color: var(--primary-green-dark);
+}
+
+/* ================================================
+   STATISTICS CARDS
+   ================================================ */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background: var(--bg-white);
+    padding: 20px 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card p {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    font-weight: 700;
+}
+
+.stat-card h2 {
+    font-size: 32px;
+    color: var(--primary-green-dark);
+    margin: 0;
+    font-weight: 700;
+}
+
+.stat-card.resolved h2 {
+    color: var(--accent-green-light);
+}
+
+.stat-card.pending h2 {
+    color: var(--pending-color);
+}
+
+.stat-card.rate h2 {
+    color: var(--primary-green-dark);
+}
+
+/* ================================================
+   CHARTS CONTAINER
+   ================================================ */
+.charts-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    flex-grow: 1;
+    margin-bottom: 20px;
+}
+
+.chart-box {
+    background: var(--bg-white);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 300px;
+}
+
+.chart-box h3 {
+    font-size: 14px;
+    margin-bottom: 15px;
+    color: #495057;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chart-box h3::before {
+    content: '';
+    width: 4px;
+    height: 16px;
+    background: var(--accent-green-light);
+    border-radius: 4px;
+}
+
+.chart-wrapper {
+    flex-grow: 1;
+    position: relative;
+    width: 100%;
+    min-height: 250px;
+}
+
+.chart-wrapper canvas {
+    max-height: 100%;
+}
+
+/* ================================================
+   CHART.JS STYLING
+   ================================================ */
+.chart-box canvas {
+    max-width: 100%;
+}
+
+/* ================================================
+   RESPONSIVE DESIGN
+   ================================================ */
+@media (max-width: 1400px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .charts-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .dashboard-content {
+        padding: 15px;
+        height: auto;
+    }
+
+    .top-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .header-buttons {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .page-header h1 {
+        font-size: 22px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .charts-container {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-box {
+        min-height: 250px;
+    }
+
+    .stat-card {
+        padding: 15px 20px;
+    }
+
+    .stat-card h2 {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 480px) {
+    .system-title {
+        font-size: 18px;
+    }
+
+    .welcome-text {
+        font-size: 16px;
+    }
+
+    .page-header h1 {
+        font-size: 18px;
+    }
+
+    .stat-card h2 {
+        font-size: 24px;
+    }
+
+    .chart-box {
+        padding: 15px;
+    }
+
+    .chart-box h3 {
+        font-size: 13px;
+    }
+
+    .btn-back {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}
