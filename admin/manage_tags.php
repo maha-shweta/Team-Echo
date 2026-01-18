@@ -90,7 +90,7 @@ $tags_result = $conn->query($tags_sql);
             <a href="../category/manage_category.php" class="nav-item">Manage Categories</a>
             <a href="manage_tags.php" class="nav-item active">Manage Tags</a>
             <a href="analytics_dashboard.php" class="nav-item">Analytics</a>
-            <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+            <a href="ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
             <a href="../feedback/export_feedback.php" class="nav-item">Export Feedback</a>
         </nav>
     </aside>

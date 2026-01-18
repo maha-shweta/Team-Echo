@@ -52,7 +52,7 @@ $result = $conn->query($sql);
             <a href="../category/manage_category.php" class="nav-item">Manage Categories</a>
             <a href="manage_tags.php" class="nav-item">Manage Tags</a>
             <a href="analytics_dashboard.php" class="nav-item">Analytics</a>
-            <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+            <a href="ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
             <a href="../feedback/export_feedback.php" class="nav-item">Export Feedback</a>
         </nav>
     </aside>
@@ -70,6 +70,15 @@ $result = $conn->query($sql);
 
         <!-- Dashboard Content -->
         <main class="dashboard-content">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>User Management</h1>
+                <p>Manage system users and their roles</p>
+            </div>
+
+            <!-- Back Button -->
+            <a href="admin_dashboard.php" class="button btn-back">← Back to Dashboard</a>
+
             <!-- Messages -->
             <?php
             if (isset($_SESSION['success'])) {
@@ -81,9 +90,6 @@ $result = $conn->query($sql);
                 unset($_SESSION['error']);
             }
             ?>
-
-            <!-- Back Button -->
-            <a href="admin_dashboard.php" class="button btn-back">← Back to Dashboard</a>
 
             <!-- User Controls -->
             <div class="user-controls">
@@ -111,7 +117,7 @@ $result = $conn->query($sql);
             <!-- Users Table -->
             <div class="table-container">
                 <div class="table-header">
-                    <h2>User Management</h2>
+                    <h2>User List</h2>
                     <span class="results-count"><?php echo $result->num_rows; ?> users found</span>
                 </div>
 

@@ -1,9 +1,10 @@
 <?php
 session_start();
+require_once('../config.php');
 
 // Ensure only logged-in users can access this page
 if (!isset($_SESSION['user_id'])) {
-    header('Location: ../user/login.php');
+    header('Location: ' . BASE_URL . '/user/login.php');
     exit;
 }
 
@@ -90,26 +91,13 @@ $conn->close();
     <aside class="sidebar">
         <div class="system-title">Feedback System</div>
         <nav class="nav-menu">
-            <?php if ($_SESSION['role'] == 'admin'): ?>
-                <a href="admin_dashboard.php" class="nav-item">Dashboard</a>
-                <a href="manage_users.php" class="nav-item">Manage Users</a>
-                <a href="manage_categories.php" class="nav-item">Categories</a>
-                <a href="manage_tags.php" class="nav-item">Tags</a>
-                <a href="analytics_dashboard.php" class="nav-item active">Analytics</a>
-                <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
-                <a href="../user/profile.php" class="nav-item">My Profile</a>
-            <?php elseif ($_SESSION['role'] == 'hr'): ?>
-                <a href="../hr/hr_dashboard.php" class="nav-item">Dashboard</a>
-                <a href="analytics_dashboard.php" class="nav-item active">Analytics</a>
-                <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
-                <a href="../user/profile.php" class="nav-item">My Profile</a>
-            <?php else: ?>
-                <a href="../user/user_dashboard.php" class="nav-item">Dashboard</a>
-                <a href="../feedback/submit_feedback.php" class="nav-item">Submit Feedback</a>
-                <a href="analytics_dashboard.php" class="nav-item active">Analytics</a>
-                <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
-                <a href="../user/profile.php" class="nav-item">My Profile</a>
-            <?php endif; ?>
+            <a href="<?php echo BASE_URL; ?>/admin/admin_dashboard.php" class="nav-item">Dashboard</a>
+            <a href="<?php echo BASE_URL; ?>/admin/manage_users.php" class="nav-item">Manage Users</a>
+            <a href="<?php echo BASE_URL; ?>/category/manage_category.php" class="nav-item">Manage Categories</a>
+            <a href="<?php echo BASE_URL; ?>/admin/manage_tags.php" class="nav-item">Manage Tags</a>
+            <a href="<?php echo BASE_URL; ?>/admin/analytics_dashboard.php" class="nav-item active">Analytics</a>
+            <a href="<?php echo BASE_URL; ?>/admin/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+            <a href="<?php echo BASE_URL; ?>/user/profile.php" class="nav-item">My Profile</a>
         </nav>
     </aside>
 
@@ -119,8 +107,8 @@ $conn->close();
         <header class="top-header">
             <div class="welcome-text">Welcome, <?php echo htmlspecialchars($_SESSION['name']); ?></div>
             <div class="header-buttons">
-                <a href="../user/profile.php" class="btn-header">Profile</a>
-                <a href="../user/logout.php" class="logout-btn">Logout</a>
+                <a href="<?php echo BASE_URL; ?>/user/profile.php" class="btn-header">Profile</a>
+                <a href="<?php echo BASE_URL; ?>/user/logout.php" class="logout-btn">Logout</a>
             </div>
         </header>
 
@@ -129,16 +117,7 @@ $conn->close();
             <!-- Page Header -->
             <div class="page-header">
                 <h1>Feedback Intelligence</h1>
-                <?php
-                // Dynamic back link based on role
-                if ($_SESSION['role'] == 'admin') {
-                    echo '<a href="admin_dashboard.php" class="btn-back">← Back to Dashboard</a>';
-                } elseif ($_SESSION['role'] == 'hr') {
-                    echo '<a href="../hr/hr_dashboard.php" class="btn-back">← Back to Dashboard</a>';
-                } else {
-                    echo '<a href="../user/user_dashboard.php" class="btn-back">← Back to Dashboard</a>';
-                }
-                ?>
+                <a href="<?php echo BASE_URL; ?>/admin/admin_dashboard.php" class="btn-back">← Back to Dashboard</a>
             </div>
 
             <!-- Statistics Cards -->

@@ -83,86 +83,115 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit User</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-        }
-        h2 {
-            color: #333;
-        }
-        form {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 5px;
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        input, select {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        input[type="submit"] {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        input[type="submit"]:hover {
-            background-color: #45a049;
-        }
-        .error {
-            color: red;
-            margin-bottom: 10px;
-        }
-        .back-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: #0066cc;
-            text-decoration: none;
-        }
-        .back-link:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <title>Edit User - Anonymous Feedback System</title>
+    <link rel="stylesheet" href="edit_user.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<h2>Edit User</h2>
+<div class="main-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="system-title">Feedback System</div>
+        <nav class="nav-menu">
+            <a href="admin_dashboard.php" class="nav-item">Dashboard</a>
+            <a href="manage_users.php" class="nav-item active">Manage Users</a>
+            <a href="../category/manage_category.php" class="nav-item">Manage Categories</a>
+            <a href="manage_tags.php" class="nav-item">Manage Tags</a>
+            <a href="analytics_dashboard.php" class="nav-item">Analytics</a>
+            <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+            <a href="../feedback/export_feedback.php" class="nav-item">Export Feedback</a>
+        </nav>
+    </aside>
 
-<?php if (isset($error_message)): ?>
-    <p class="error"><?php echo htmlspecialchars($error_message); ?></p>
-<?php endif; ?>
+    <!-- Main Content Area -->
+    <div class="content-area">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="welcome-text">Welcome, Admin <?php echo htmlspecialchars($_SESSION['name']); ?></div>
+            <div class="header-buttons">
+                <a href="../user/profile.php" class="btn-header">Profile</a>
+                <a href="../user/logout.php" class="logout-btn">Logout</a>
+            </div>
+        </header>
 
-<form method="POST" action="">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($user['name']); ?>" required>
+        <!-- Dashboard Content -->
+        <main class="dashboard-content">
+            <div class="container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1>Edit User</h1>
+                    <p>Update user information and role settings</p>
+                </div>
 
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                <!-- Back Button -->
+                <a href="manage_users.php" class="button btn-back">← Back to Manage Users</a>
 
-    <label for="role">Role:</label>
-    <select id="role" name="role" required>
-        <option value="admin" <?php echo $user['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
-        <option value="hr" <?php echo $user['role'] == 'hr' ? 'selected' : ''; ?>>HR</option>
-        <option value="user" <?php echo $user['role'] == 'user' ? 'selected' : ''; ?>>User</option>
-    </select>
+                <!-- Messages -->
+                <?php if (isset($error_message)): ?>
+                    <div class="message error">✗ <?php echo htmlspecialchars($error_message); ?></div>
+                <?php endif; ?>
 
-    <input type="submit" value="Update User">
-</form>
+                <!-- User Info Box -->
+                <div class="info-box">
+                    <h4>User Information</h4>
+                    <div class="info-item">
+                        <span>User ID:</span>
+                        <span>#<?php echo htmlspecialchars($user['user_id']); ?></span>
+                    </div>
+                    <div class="info-item">
+                        <span>Current Role:</span>
+                        <span class="badge"><?php echo htmlspecialchars(ucfirst($user['role'])); ?></span>
+                    </div>
+                    <div class="info-item">
+                        <span>Member Since:</span>
+                        <span><?php echo date('M d, Y', strtotime($user['created_at'])); ?></span>
+                    </div>
+                </div>
 
-<a href="manage_users.php" class="back-link">← Back to Manage Users</a>
+                <!-- Edit User Form -->
+                <div class="form-card">
+                    <h3>Update User Details</h3>
+                    <form method="POST" action="">
+                        <div class="form-group">
+                            <label for="name">Full Name <span class="required">*</span></label>
+                            <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($user['name']); ?>" required>
+                            <span class="help-text">Enter the user's full name</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address <span class="required">*</span></label>
+                            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                            <span class="help-text">This email will be used for login and notifications</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="role">User Role <span class="required">*</span></label>
+                            <select id="role" name="role" required>
+                                <option value="admin" <?php echo $user['role'] == 'admin' ? 'selected' : ''; ?>>Admin</option>
+                                <option value="hr" <?php echo $user['role'] == 'hr' ? 'selected' : ''; ?>>HR</option>
+                                <option value="user" <?php echo $user['role'] == 'user' ? 'selected' : ''; ?>>User</option>
+                            </select>
+                            <span class="help-text">Select the appropriate role for this user</span>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Update User</button>
+                    </form>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="button-group">
+                    <a href="delete_user.php?id=<?php echo $user['user_id']; ?>" 
+                       class="btn-danger"
+                       onclick="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
+                        Delete User
+                    </a>
+                    <a href="manage_users.php" class="btn-secondary">Cancel & Go Back</a>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
 
 </body>
 </html>
