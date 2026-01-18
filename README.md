@@ -90,6 +90,70 @@ The "Team-Echo AI" engine bridges **PHP** and **Python (NLTK)** to understand th
 
 
 
+Frontend Implementation 
+
+#### (Mehenaz)
+##  Frontend Implementation 
+
+###  User Authentication & Authorization UI
+1. Login interface for registered users
+2.Role-based dashboard redirection (User / Admin / HR)
+3.Secure session handling via PHP integration
+
+###  Feedback Submission Interface
+1.Category selection dropdown
+2.Multi-tag selection for classification
+3.Anonymous submission form
+4.File attachment upload UI
+5.Real-time validation and error prompts
+
+###  Feedback Display & Interaction
+1.Feedback cards with category, tags, priority, and status
+2.Voting buttons (Upvote / Downvote)
+3.Dynamic vote count updates
+4.Keyword cloud visualization section
+
+###  Commenting System UI
+1.Public comment section under each feedback
+2.Threaded replies
+3.Timestamp & author display
+4.Edit/Delete options (Admin/HR restricted)
+5.Internal comments section visible only to Admin & HR
+
+###  Admin & HR Dashboard UI
+1.Feedback management panel
+2.Priority change dropdown (Low → Critical)
+3.Resolve feedback action button
+4.Tag assignment and removal interface
+5.CSV export trigger button
+
+###  Attachments Viewer
+1.File preview/download options for uploaded feedback files
+2.Organized attachment display per feedback
+
+
+###  Feedback Analytics Dashboard
+1.Category-based filters
+2.Status and priority filters
+3.Visual charts and feedback summaries
+4.Keyword cloud display for trend understanding
+
+
+###  Frontend Technologies Used
+HTML5
+CSS3
+JavaScript
+
+
+
+
+
+
+
+
+
+
+
 
 
 
