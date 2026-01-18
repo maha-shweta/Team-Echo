@@ -1,9 +1,10 @@
 <?php
 session_start();
+require_once('../config.php');
 
 // Ensure only HR can access the HR dashboard
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'hr') {
-    header('Location: ../user/login.php');
+    header('Location: ' . BASE_URL . '/user/login.php');
     exit;
 }
 
@@ -100,13 +101,11 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
         <aside class="sidebar">
             <div class="system-title">Feedback System</div>
             <nav class="nav-menu">
-                <a href="hr_dashboard.php" class="nav-item active">Dashboard</a>
-                <a href="analytics_dashboard.php" class="nav-item">Analytics</a>
-                <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
-            
-                <a href="../feedback/export_feedback.php" class="nav-item">Export Data</a>
-                <!-- <a href="generate_feedback_report.php" class="nav-item">Reports</a> -->
-                <a href="../user/profile.php" class="nav-item">Profile</a>
+                <a href="<?php echo BASE_URL; ?>/hr/hr_dashboard.php" class="nav-item active">Dashboard</a>
+                <a href="<?php echo BASE_URL; ?>/hr/analytics_dashboard.php" class="nav-item">Analytics</a>
+                <a href="<?php echo BASE_URL; ?>/hr/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+                <a href="<?php echo BASE_URL; ?>/feedback/export_feedback.php" class="nav-item">Export Data</a>
+                <a href="<?php echo BASE_URL; ?>/user/profile.php" class="nav-item">Profile</a>
             </nav>
         </aside>
 
@@ -116,9 +115,9 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
             <header class="top-header">
                 <div class="welcome-text">Welcome, HR <?php echo htmlspecialchars($_SESSION['name']); ?></div>
                 <div class="header-buttons">
-                    <a href="../user/profile.php" class="btn-header">Profile</a>
-                    <a href="generate_feedback_report.php" class="btn-header">Generate Report</a>
-                    <a href="../user/logout.php" class="logout-btn">Logout</a>
+                    <a href="<?php echo BASE_URL; ?>/user/profile.php" class="btn-header">Profile</a>
+                    <a href="<?php echo BASE_URL; ?>/hr/generate_feedback_report.php" class="btn-header">Generate Report</a>
+                    <a href="<?php echo BASE_URL; ?>/user/logout.php" class="logout-btn">Logout</a>
                 </div>
             </header>
 
@@ -211,7 +210,7 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
                         </div>
                         <div class="filter-buttons">
                             <button type="submit" class="button btn-primary">Apply Filters</button>
-                            <a href="hr_dashboard.php" class="button btn-success">Clear Filters</a>
+                            <a href="<?php echo BASE_URL; ?>/hr/hr_dashboard.php" class="button btn-success">Clear Filters</a>
                         </div>
                     </form>
                 </div>
@@ -251,10 +250,8 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
                                 }
                             ?>
                             <tr class="<?php echo trim($row_class); ?>">
-                                <!-- ID Column -->
                                 <td><strong>#<?php echo htmlspecialchars($row['feedback_id']); ?></strong></td>
                                 
-                                <!-- Priority Column -->
                                 <td>
                                     <span class="priority-badge priority-<?php echo $row['priority'] ?? 'medium'; ?>">
                                         <span class="priority-dot"></span>
@@ -262,10 +259,8 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
                                     </span>
                                 </td>
                                 
-                                <!-- Category Column -->
                                 <td><?php echo htmlspecialchars($row['category_name']); ?></td>
                                 
-                                <!-- Sentiment Column -->
                                 <td>
                                     <?php 
                                     $sentiment = $row['sentiment_label'] ?? 'Pending';
@@ -276,10 +271,8 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
                                     </span>
                                 </td>
                                 
-                                <!-- Feedback Text Column -->
                                 <td><?php echo htmlspecialchars(substr($row['feedback_text'], 0, 80)) . (strlen($row['feedback_text']) > 80 ? '...' : ''); ?></td>
                                 
-                                <!-- Tags Column -->
                                 <td>
                                     <?php
                                     if (!empty($row['tags'])) {
@@ -301,10 +294,8 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
                                     ?>
                                 </td>
                                 
-                                <!-- Submitted Date Column -->
                                 <td><?php echo date('M d, Y', strtotime($row['submitted_at'])); ?></td>
                                 
-                                <!-- Status Column -->
                                 <td>
                                     <?php if ($row['is_resolved']): ?>
                                         <span class="badge badge-resolved">Resolved</span>
@@ -313,9 +304,8 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
                                     <?php endif; ?>
                                 </td>
                                 
-                                <!-- Actions Column -->
                                 <td>
-                                    <a href="../feedback/view_feedback.php?id=<?php echo $row['feedback_id']; ?>" class="action-link">
+                                    <a href="<?php echo BASE_URL; ?>/feedback/view_feedback.php?id=<?php echo $row['feedback_id']; ?>" class="action-link">
                                         View
                                         <?php if ($row['comment_count'] > 0): ?>
                                             <span style="background: var(--primary-green-dark); color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; margin-left: 5px;">
@@ -323,11 +313,11 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
                                             </span>
                                         <?php endif; ?>
                                     </a>
-                                    <a href="../feedback/manage_feedback_tags.php?id=<?php echo $row['feedback_id']; ?>" class="action-link manage-link">Manage</a>
+                                    <a href="<?php echo BASE_URL; ?>/feedback/manage_feedback_tags.php?id=<?php echo $row['feedback_id']; ?>" class="action-link manage-link">Manage</a>
                                     <?php if (!$row['is_resolved']): ?>
-                                        <a href="../feedback/resolve_feedback.php?id=<?php echo $row['feedback_id']; ?>" class="action-link">Resolve</a>
+                                        <a href="<?php echo BASE_URL; ?>/feedback/resolve_feedback.php?id=<?php echo $row['feedback_id']; ?>" class="action-link">Resolve</a>
                                     <?php endif; ?>
-                                    <a href="../feedback/delete_feedback.php?id=<?php echo $row['feedback_id']; ?>" class="action-link delete-link" onclick="return confirm('Are you sure you want to delete this feedback?')">Delete</a>
+                                    <a href="<?php echo BASE_URL; ?>/feedback/delete_feedback.php?id=<?php echo $row['feedback_id']; ?>" class="action-link delete-link" onclick="return confirm('Are you sure you want to delete this feedback?')">Delete</a>
                                 </td>
                             </tr>
                             <?php endwhile; ?>
@@ -343,10 +333,10 @@ $high_priority = $conn->query("SELECT COUNT(*) as count FROM feedback WHERE prio
             </main>
         </div>
     </div>
+
+    <?php include('../includes/chatbot.php'); ?>
 </body>
 </html>
-
-<?php include('../includes/chatbot.php'); ?>
 
 <?php
 $conn->close();
