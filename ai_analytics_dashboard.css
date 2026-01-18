@@ -22,7 +22,6 @@ body {
     min-height: 100vh;
 }
 
-/* === SIDEBAR (MATCHES ADMIN DASHBOARD) === */
 .sidebar {
     width: 240px;
     background-color: #ffffff; 
@@ -43,8 +42,6 @@ body {
     flex-direction: column;
 }
 
-/* Support both .nav-link and .nav-item */
-.nav-item,
 .nav-link {
     padding: 12px 20px;
     text-decoration: none;
@@ -55,7 +52,6 @@ body {
     display: block;
 }
 
-.nav-item.active,
 .nav-link.active {
     background-color: #f0f8ff; 
     color: var(--primary-green-dark);
@@ -63,7 +59,6 @@ body {
     border-left-color: var(--primary-green-dark); 
 }
 
-.nav-item:hover:not(.active),
 .nav-link:hover:not(.active) {
     background-color: #f9f9f9;
 }

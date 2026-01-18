@@ -1,358 +1,273 @@
 <?php
+// D:\project imp\htdocs\Team-Echo\dashboard\ai_analytics_dashboard.php
 session_start();
+include('../db/db.php'); 
 
-// Ensure only Admin can access
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
-    header('Location: ../user/login.php');
-    exit;
-}
+if (!$conn) { die("Database connection failed."); }
 
-include('../db/db.php');
+// --- 1. FILTER LOGIC ---
+$filter_cat = $_GET['category'] ?? '';
+$start_date = $_GET['start_date'] ?? '';
+$end_date = $_GET['end_date'] ?? '';
+$where_clauses = ["1=1"];
 
-// Handle tag deletion
-if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
-    $tag_id = intval($_GET['delete']);
-    $delete_sql = "DELETE FROM tags WHERE tag_id = ?";
-    $stmt = $conn->prepare($delete_sql);
-    $stmt->bind_param("i", $tag_id);
-    if ($stmt->execute()) {
-        $_SESSION['success'] = "Tag deleted successfully!";
-    } else {
-        $_SESSION['error'] = "Error deleting tag.";
-    }
-    $stmt->close();
-    header('Location: manage_tags.php');
-    exit;
-}
+if (!empty($start_date)) $where_clauses[] = "f.submitted_at >= '" . $conn->real_escape_string($start_date) . " 00:00:00'";
+if (!empty($end_date)) $where_clauses[] = "f.submitted_at <= '" . $conn->real_escape_string($end_date) . " 23:59:59'";
+if (!empty($filter_cat)) $where_clauses[] = "f.category_id = " . intval($filter_cat);
 
-// Handle add new tag
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_tag'])) {
-    $tag_name = trim($_POST['tag_name']);
-    $tag_color = trim($_POST['tag_color']);
+$where_sql = implode(" AND ", $where_clauses);
+
+// --- 2. TREND & ALERT CALCULATIONS ---
+$current_week = $conn->query("SELECT COUNT(*) as total FROM feedback f WHERE f.submitted_at >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND $where_sql")->fetch_assoc()['total'];
+$prev_week = $conn->query("SELECT COUNT(*) as total FROM feedback f WHERE f.submitted_at >= DATE_SUB(NOW(), INTERVAL 14 DAY) AND f.submitted_at < DATE_SUB(NOW(), INTERVAL 7 DAY) AND $where_sql")->fetch_assoc()['total'];
+
+$diff = $current_week - $prev_week;
+$percent_change = ($prev_week > 0) ? round(($diff / $prev_week) * 100) : ($current_week * 100);
+
+// Thresholds
+$alert_threshold_volume = 50; 
+$volume_alert = ($percent_change >= $alert_threshold_volume);
+
+// --- 3. CHART DATA ---
+$total_mentions = $conn->query("SELECT COUNT(*) as total FROM feedback f WHERE $where_sql")->fetch_assoc()['total'];
+$neg_data = $conn->query("SELECT COUNT(*) as count FROM feedback f WHERE $where_sql AND sentiment_label = 'Negative'")->fetch_assoc()['count'];
+$neg_percent = $total_mentions > 0 ? round(($neg_data / $total_mentions) * 100) : 0;
+$sentiment_alert = ($neg_percent >= 25);
+
+// Chart Arrays
+$s_res = $conn->query("SELECT sentiment_label, COUNT(*) as count FROM feedback f WHERE $where_sql GROUP BY sentiment_label");
+$s_labels = []; $s_counts = [];
+while($r = $s_res->fetch_assoc()){ $s_labels[] = $r['sentiment_label']; $s_counts[] = $r['count']; }
+
+$line_res = $conn->query("SELECT DATE(f.submitted_at) as date, COUNT(*) as count FROM feedback f WHERE $where_sql GROUP BY DATE(f.submitted_at) ORDER BY date ASC LIMIT 7");
+$l_labels = []; $l_values = [];
+while($r = $line_res->fetch_assoc()){ $l_labels[] = date("M d", strtotime($r['date'])); $l_values[] = $r['count']; }
+
+// --- 4. TRENDING TOPICS / WORD CLOUD DATA FROM FEEDBACK TEXT ---
+function extractKeywords($text) {
+    // Common stop words to filter out
+    $stopWords = ['the', 'is', 'at', 'which', 'on', 'a', 'an', 'as', 'are', 'was', 'were', 
+                  'been', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would',
+                  'could', 'should', 'may', 'might', 'can', 'to', 'of', 'in', 'for', 'with',
+                  'and', 'or', 'but', 'not', 'this', 'that', 'by', 'from', 'it', 'its'];
     
-    if (!empty($tag_name)) {
-        $sql = "INSERT INTO tags (tag_name, tag_color) VALUES (?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $tag_name, $tag_color);
-        if ($stmt->execute()) {
-            $_SESSION['success'] = "Tag added successfully!";
+    // Convert to lowercase and remove special characters
+    $text = strtolower($text);
+    $text = preg_replace('/[^a-z0-9\s]/', ' ', $text);
+    
+    // Split into words
+    $words = preg_split('/\s+/', $text);
+    
+    // Filter out stop words and short words
+    $keywords = array_filter($words, function($word) use ($stopWords) {
+        return strlen($word) > 3 && !in_array($word, $stopWords);
+    });
+    
+    return $keywords;
+}
+
+// Get all feedback text for trending topics
+$trending_query = "SELECT feedback_text FROM feedback f WHERE $where_sql";
+$trending_result = $conn->query($trending_query);
+
+$all_keywords = [];
+while($row = $trending_result->fetch_assoc()) {
+    $keywords = extractKeywords($row['feedback_text']);
+    foreach($keywords as $word) {
+        if(isset($all_keywords[$word])) {
+            $all_keywords[$word]++;
         } else {
-            $_SESSION['error'] = "Error adding tag: " . $stmt->error;
+            $all_keywords[$word] = 1;
         }
-        $stmt->close();
-        header('Location: manage_tags.php');
-        exit;
     }
 }
 
-// Fetch all tags
-$tags_sql = "SELECT t.*, 
-             (SELECT COUNT(*) FROM feedback_tags WHERE tag_id = t.tag_id) as usage_count
-             FROM tags t
-             ORDER BY t.tag_name";
-$tags_result = $conn->query($tags_sql);
-
+// Sort by frequency and get top 20
+arsort($all_keywords);
+$trending_topics = array_slice($all_keywords, 0, 20, true);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Tags</title>
+    <title>AI Analytics Dashboard</title>
+    <link rel="stylesheet" href="ai_analytics_dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f6fa;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, #0C4F3B 0%, #5a32a3 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            opacity: 0.9;
-            font-size: 14px;
-        }
-        
-        /* Messages */
-        .message {
-            padding: 15px 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            animation: slideIn 0.3s ease;
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
-        }
-        
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
-        
-        /* Navigation */
-        .nav-buttons {
+        .word-cloud-container {
             display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-        
-        .button {
-            padding: 12px 24px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-        }
-        
-        /* Add Tag Form */
-        .add-tag-section {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-        }
-        
-        .add-tag-section h2 {
-            margin-bottom: 20px;
-            color: #333;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr auto;
-            gap: 15px;
-            align-items: end;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            color: #495057;
-            font-size: 13px;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #e1e8ed;
-            border-radius: 6px;
-            font-size: 14px;
-        }
-        
-        .form-group input:focus {
-            outline: none;
-            border-color: #6f42c1;
-        }
-        
-        .btn-primary {
-            background: #6f42c1;
-            color: white;
-            padding: 10px 24px;
-        }
-        
-        .btn-primary:hover {
-            background: #5a32a3;
-        }
-        
-        /* Tags Grid */
-        .tags-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        
-        .tag-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease;
-        }
-        
-        .tag-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-        }
-        
-        .tag-header {
-            display: flex;
-            justify-content: space-between;
+            flex-wrap: wrap;
+            justify-content: center;
             align-items: center;
-            margin-bottom: 15px;
+            gap: 15px;
+            padding: 20px;
+            min-height: 250px;
         }
         
-        .tag-badge {
+        .word-item {
+            display: inline-block;
             padding: 8px 16px;
+            margin: 5px;
             border-radius: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .word-item:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .no-data-message {
+            text-align: center;
+            color: #999;
             font-size: 14px;
-        }
-        
-        .tag-stats {
-            color: #6c757d;
-            font-size: 13px;
-        }
-        
-        .tag-actions {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-        }
-        
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 4px;
-        }
-        
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
-        
-        .btn-danger:hover {
-            background: #c82333;
-        }
-        
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .tags-grid {
-                grid-template-columns: 1fr;
-            }
+            padding: 40px;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- Header -->
-    <div class="header">
-        <h1>🏷️ Tag Management</h1>
-        <p>Create and manage feedback tags</p>
+<div class="top-nav">
+    <div class="nav-brand"><i class="fa fa-robot"></i> TeamEcho AI</div>
+    <form class="filter-form" method="GET">
+        <input type="date" name="start_date" value="<?php echo $start_date; ?>">
+        <input type="date" name="end_date" value="<?php echo $end_date; ?>">
+        <select name="category">
+            <option value="">Categories</option>
+            <?php 
+            $cats = $conn->query("SELECT * FROM category");
+            while($c = $cats->fetch_assoc()) {
+                $sel = ($filter_cat == $c['category_id']) ? 'selected' : '';
+                echo "<option value='{$c['category_id']}' $sel>{$c['category_name']}</option>";
+            }
+            ?>
+        </select>
+        <button type="submit" class="filter-btn">Filter</button>
+        <a href="ai_analytics_dashboard.php" class="reset-link">Reset</a>
+    </form>
+</div>
+
+<div class="dashboard-layout">
+    <div class="sidebar-metrics">
+        <div class="metric-box">
+            <div class="metric-label">System Health</div>
+            <div class="metric-value" style="font-size: 16px; color: <?php echo ($volume_alert || $sentiment_alert) ? '#e74c3c' : '#2ecc71'; ?>;">
+                <i class="fa <?php echo ($volume_alert || $sentiment_alert) ? 'fa-exclamation-circle' : 'fa-check-circle'; ?>"></i>
+                <?php echo ($volume_alert || $sentiment_alert) ? 'Attention Needed' : 'All Stable'; ?>
+            </div>
+        </div>
+
+        <div class="metric-box">
+            <div class="metric-label">Mentions Trend</div>
+            <div class="metric-value">
+                <?php echo number_format($total_mentions); ?>
+                <span class="trend-badge" style="color:<?php echo ($diff >= 0) ? '#2ecc71' : '#e74c3c'; ?>;">
+                    <i class="fa <?php echo ($diff >= 0) ? 'fa-caret-up' : 'fa-caret-down'; ?>"></i> <?php echo abs($percent_change); ?>%
+                </span>
+            </div>
+        </div>
+
+        <div class="metric-box">
+            <div class="metric-label">Dept. Heatmap</div>
+            <?php
+            $h_res = $conn->query("SELECT c.category_name, AVG(f.sentiment_score) as avg FROM feedback f JOIN category c ON f.category_id = c.category_id WHERE $where_sql GROUP BY c.category_id");
+            if($h_res && $h_res->num_rows > 0):
+                while($h = $h_res->fetch_assoc()):
+                    $avg_score = $h['avg'] ?? 0;
+                    $bg = ($avg_score < -0.1) ? '#f8d7da' : (($avg_score > 0.1) ? '#d4edda' : '#fff');
+                ?>
+                <div class="heatmap-item" style="background:<?php echo $bg; ?>;"><?php echo $h['category_name']; ?> <strong><?php echo round($avg_score, 1); ?></strong></div>
+                <?php endwhile;
+            else: ?>
+                <div class="no-data-message">No data available</div>
+            <?php endif; ?>
+        </div>
     </div>
-    
-    <!-- Messages -->
-    <?php
-    if (isset($_SESSION['success'])) {
-        echo '<div class="message success">✅ ' . htmlspecialchars($_SESSION['success']) . '</div>';
-        unset($_SESSION['success']);
-    }
-    if (isset($_SESSION['error'])) {
-        echo '<div class="message error">❌ ' . htmlspecialchars($_SESSION['error']) . '</div>';
-        unset($_SESSION['error']);
-    }
-    ?>
-    
-    <!-- Navigation -->
-    <div class="nav-buttons">
-        <a href="admin_dashboard.php" class="button btn-secondary">← Back to Dashboard</a>
-    </div>
-    
-    <!-- Add Tag Section -->
-    <div class="add-tag-section">
-        <h2>➕ Add New Tag</h2>
-        <form method="POST" action="">
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="tag_name">Tag Name *</label>
-                    <input type="text" id="tag_name" name="tag_name" required placeholder="e.g., Urgent, Bug Fix">
-                </div>
-                <div class="form-group">
-                    <label for="tag_color">Tag Color *</label>
-                    <input type="color" id="tag_color" name="tag_color" value="#667eea" required>
-                </div>
-                <div class="form-group">
-                    <button type="submit" name="add_tag" class="button btn-primary">Add Tag</button>
+
+    <div class="main-charts">
+        <div class="card <?php echo $sentiment_alert ? 'alert-active' : ''; ?>">
+            <div class="card-title">Sentiment Ratio</div>
+            <div class="chart-container"><canvas id="sentimentChart"></canvas></div>
+        </div>
+
+        <div class="card <?php echo $volume_alert ? 'alert-active' : ''; ?>">
+            <div class="card-title">
+                <span>Volume Trends</span>
+                <div class="card-summary">
+                    <span class="summary-value"><?php echo $current_week; ?></span>
+                    <span class="summary-trend" style="color:<?php echo ($diff >= 0) ? '#2ecc71' : '#e74c3c'; ?>;">
+                        <i class="fa <?php echo ($diff >= 0) ? 'fa-caret-up' : 'fa-caret-down'; ?>"></i> <?php echo abs($percent_change); ?>%
+                    </span>
                 </div>
             </div>
-        </form>
-    </div>
-    
-    <!-- Tags Grid -->
-    <h2 style="margin-bottom: 20px; color: #333;">📋 All Tags (<?php echo $tags_result->num_rows; ?>)</h2>
-    <div class="tags-grid">
-        <?php if ($tags_result->num_rows > 0): ?>
-            <?php while ($tag = $tags_result->fetch_assoc()): ?>
-                <div class="tag-card">
-                    <div class="tag-header">
-                        <span class="tag-badge" style="background-color: <?php echo htmlspecialchars($tag['tag_color']); ?>">
-                            <?php echo htmlspecialchars($tag['tag_name']); ?>
-                        </span>
-                    </div>
-                    <div class="tag-stats">
-                        📊 Used in <?php echo $tag['usage_count']; ?> feedback(s)
-                    </div>
-                    <div class="tag-actions">
-                        <a href="?delete=<?php echo $tag['tag_id']; ?>" 
-                           class="button btn-sm btn-danger" 
-                           onclick="return confirm('Delete this tag? It will be removed from all feedback.')">
-                            🗑️ Delete
-                        </a>
-                    </div>
-                </div>
-            <?php endwhile; ?>
-        <?php else: ?>
-            <p style="grid-column: 1/-1; text-align: center; color: #6c757d;">No tags found. Add your first tag above!</p>
-        <?php endif; ?>
+            <div class="chart-container"><canvas id="lineChart"></canvas></div>
+        </div>
+
+        <div class="card word-cloud-wide">
+            <div class="card-title">Trending Topics (from Feedback)</div>
+            <div class="word-cloud-container">
+                <?php 
+                if(!empty($trending_topics)) {
+                    $max_count = max($trending_topics);
+                    $min_count = min($trending_topics);
+                    
+                    foreach($trending_topics as $word => $count) {
+                        // Calculate font size based on frequency (12px to 28px)
+                        $size = 12 + (($count - $min_count) / max(1, ($max_count - $min_count))) * 16;
+                        echo "<span class='word-item' style='font-size: {$size}px;' title='Mentioned $count times'>" . 
+                             htmlspecialchars($word) . " <small>($count)</small></span>";
+                    }
+                } else {
+                    echo "<div class='no-data-message'>No feedback data available for trending topics</div>";
+                }
+                ?>
+            </div>
+        </div>
     </div>
 </div>
 
+<script>
+// Sentiment Chart
+new Chart(document.getElementById('sentimentChart'), {
+    type: 'doughnut',
+    data: {
+        labels: <?php echo json_encode($s_labels); ?>,
+        datasets: [{ data: <?php echo json_encode($s_counts); ?>, backgroundColor: ['#2ecc71', '#e74c3c', '#f1c40f'], borderWidth: 0 }]
+    },
+    options: { cutout: '80%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } },
+    plugins: [{
+        id: 'centerText',
+        afterDraw: (chart) => {
+            const { ctx, chartArea: { left, top, width, height } } = chart;
+            ctx.save(); ctx.textAlign = 'center';
+            ctx.font = 'bold 22px sans-serif'; ctx.fillStyle = '#1a2b49';
+            ctx.fillText('<?php echo $total_mentions; ?>', left + width / 2, top + height / 2 + 5);
+            ctx.font = 'bold 11px sans-serif'; ctx.fillStyle = '<?php echo $sentiment_alert ? "#e74c3c" : "#888"; ?>';
+            ctx.fillText('NEG: <?php echo $neg_percent; ?>%', left + width / 2, top + height / 2 + 25);
+            ctx.restore();
+        }
+    }]
+});
+
+// Line Chart
+new Chart(document.getElementById('lineChart'), {
+    type: 'line',
+    data: {
+        labels: <?php echo json_encode($l_labels); ?>,
+        datasets: [{ data: <?php echo json_encode($l_values); ?>, borderColor: '#0099cc', borderWidth: 2, tension: 0.4, fill: true, backgroundColor: 'rgba(0,153,204,0.05)', pointRadius: 0 }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { size: 10 } } } }
+    }
+});
+</script>
 </body>
 </html>
-
-<?php
-$conn->close();
-?>
