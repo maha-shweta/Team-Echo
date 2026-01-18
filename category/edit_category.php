@@ -84,311 +84,587 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Category</title>
+    <title>Edit Category - Anonymous Feedback System</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: Arial, sans-serif;
         }
-        
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background-color: #f5f7f8;
+        }
+
+        :root {
+            --primary-green-dark: #0c4f3b; 
+            --accent-green-light: #32b25e;
+            --pending-color: #f39c12;
+            --critical-color: #dc3545;
+            --text-dark: #333;
+            --text-muted: #6c757d;
+            --border-light: #e1e8ed;
+            --bg-white: #ffffff;
+        }
+
+        .main-layout {
             display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 240px;
+            background-color: var(--bg-white);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+
+        .system-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-green-dark);
+            padding: 0 20px 30px 20px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #555;
+            font-size: 15px;
+            transition: background-color 0.2s, color 0.2s;
+            border-left: 5px solid transparent;
+        }
+
+        .nav-item.active {
+            background-color: #f0f8ff;
+            color: var(--primary-green-dark);
+            font-weight: 600;
+            border-left-color: var(--primary-green-dark);
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: #f9f9f9;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-header {
+            background-color: var(--primary-green-dark);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
         }
-        
-        .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            max-width: 550px;
-            width: 100%;
-            padding: 40px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .header .icon {
-            font-size: 64px;
-            margin-bottom: 15px;
-        }
-        
-        .header h2 {
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 10px;
-        }
-        
-        .header p {
-            color: #6c757d;
-            font-size: 14px;
-        }
-        
-        .info-box {
-            background: #e7f3ff;
-            border-left: 4px solid #0066cc;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        
-        .info-box h4 {
-            font-size: 14px;
-            color: #0066cc;
-            margin-bottom: 10px;
+
+        .welcome-text {
+            font-size: 18px;
             font-weight: 600;
         }
-        
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .logout-btn,
+        .btn-header {
+            background-color: var(--primary-green-dark);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            padding: 8px 22px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.10);
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .logout-btn:hover,
+        .btn-header:hover {
+            background-color: #085826;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .button {
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-back {
+            background: white;
+            color: var(--primary-green-dark);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 2px solid var(--border-light);
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary-green-dark);
+        }
+
+        .dashboard-content {
+            padding: 30px;
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .container {
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .page-header {
+            margin-bottom: 15px;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-green-dark);
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .message {
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid var(--critical-color);
+        }
+
+        .info-box {
+            background: var(--bg-white);
+            padding: 20px 25px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-green-dark);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .info-box h4 {
+            color: var(--primary-green-dark);
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
         .info-item {
             display: flex;
             justify-content: space-between;
-            padding: 6px 0;
-            font-size: 13px;
-            color: #333;
-            border-bottom: 1px solid rgba(0, 102, 204, 0.1);
+            padding: 12px 0;
+            border-bottom: 1px solid #e1e8ed;
+            font-size: 14px;
         }
-        
+
         .info-item:last-child {
             border-bottom: none;
         }
-        
+
         .info-item span:first-child {
-            font-weight: 600;
-            color: #0066cc;
+            color: var(--text-muted);
+            font-weight: 500;
         }
-        
+
         .info-item span:last-child {
-            color: #333;
-        }
-        
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #dc3545;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .warning {
-            background-color: #fff3cd;
-            color: #856404;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid #ffc107;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-        }
-        
-        .warning-icon {
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        
-        .form-group {
-            margin-bottom: 25px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
+            color: var(--text-dark);
             font-weight: 600;
-            color: #333;
-            font-size: 14px;
         }
-        
-        .input-wrapper {
-            position: relative;
-        }
-        
-        .input-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6c757d;
-            font-size: 18px;
-        }
-        
-        input[type="text"] {
-            width: 100%;
-            padding: 14px 14px 14px 45px;
-            border: 2px solid #e1e8ed;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-        }
-        
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .char-count {
-            text-align: right;
-            font-size: 12px;
-            color: #6c757d;
-            margin-top: 5px;
-        }
-        
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 30px;
-        }
-        
-        .btn {
-            flex: 1;
-            padding: 14px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            text-decoration: none;
-            text-align: center;
-            display: inline-block;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-        
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
+
+        .info-item .badge {
+            background: var(--primary-green-dark);
+            color: white !important;
+            padding: 4px 12px;
             border-radius: 12px;
             font-size: 12px;
             font-weight: 600;
-            background: #667eea;
+            text-transform: uppercase;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid var(--pending-color);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .warning-icon {
+            font-size: 24px;
+            color: var(--pending-color);
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        .warning-content {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .warning-content strong {
+            font-weight: 600;
+        }
+
+        .form-card {
+            background: var(--bg-white);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        .form-card h3 {
+            color: var(--primary-green-dark);
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 13px;
+        }
+
+        .required {
+            color: var(--critical-color);
+            margin-left: 3px;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--border-light);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-green-dark);
+            box-shadow: 0 0 0 3px rgba(12, 79, 59, 0.1);
+        }
+
+        .char-count {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            text-align: right;
+        }
+
+        .char-count span {
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px 24px;
+            background: var(--primary-green-dark);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary:hover {
+            background: #085826;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(12, 79, 59, 0.3);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn-danger {
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            flex: 1;
+            min-width: 180px;
+            background: var(--critical-color);
             color: white;
         }
-        
-        /* Responsive */
-        @media (max-width: 600px) {
-            .container {
-                padding: 30px 20px;
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.3);
+        }
+
+        .btn-secondary {
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            flex: 1;
+            min-width: 180px;
+            background: var(--text-muted);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .main-layout {
+                flex-direction: column;
             }
-            
-            .header h2 {
-                font-size: 24px;
+
+            .sidebar {
+                width: 100%;
             }
-            
+
+            .dashboard-content {
+                padding: 15px;
+            }
+
+            .top-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .header-buttons {
+                width: 100%;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .page-header h1 {
+                font-size: 22px;
+            }
+
+            .form-card,
+            .info-box,
+            .warning-box {
+                padding: 20px;
+            }
+
             .button-group {
                 flex-direction: column;
+            }
+
+            .btn-danger,
+            .btn-secondary {
+                min-width: 100%;
+            }
+
+            .info-item {
+                flex-direction: column;
+                gap: 8px;
             }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <div class="icon">✏️</div>
-        <h2>Edit Category</h2>
-        <p>Update category information</p>
-    </div>
-    
-    <!-- Category Information -->
-    <div class="info-box">
-        <h4>📊 Category Information</h4>
-        <div class="info-item">
-            <span>Category ID:</span>
-            <span>#<?php echo htmlspecialchars($category['category_id']); ?></span>
-        </div>
-        <div class="info-item">
-            <span>Current Name:</span>
-            <span><?php echo htmlspecialchars($category['category_name']); ?></span>
-        </div>
-        <div class="info-item">
-            <span>Feedback Count:</span>
-            <span class="badge"><?php echo $category['feedback_count']; ?> feedback(s)</span>
-        </div>
-        <div class="info-item">
-            <span>Created At:</span>
-            <span><?php echo date('M d, Y', strtotime($category['created_at'])); ?></span>
-        </div>
-    </div>
-    
-    <!-- Warning if category has feedback -->
-    <?php if ($category['feedback_count'] > 0): ?>
-    <div class="warning">
-        <span class="warning-icon">⚠️</span>
-        <div>
-            <strong>Warning:</strong> This category has <strong><?php echo $category['feedback_count']; ?></strong> feedback(s) associated with it. Changing the name will affect all related feedback entries.
-        </div>
-    </div>
-    <?php endif; ?>
-    
-    <!-- Error Message -->
-    <?php if (isset($error_message)): ?>
-        <div class="error">
-            ❌ <?php echo htmlspecialchars($error_message); ?>
-        </div>
-    <?php endif; ?>
-    
-    <!-- Edit Form -->
-    <form method="POST" action="" id="categoryForm">
-        <div class="form-group">
-            <label for="category_name">New Category Name *</label>
-            <div class="input-wrapper">
-                <span class="input-icon">📂</span>
-                <input 
-                    type="text" 
-                    id="category_name" 
-                    name="category_name" 
-                    required
-                    minlength="3"
-                    maxlength="100"
-                    placeholder="Enter new category name"
-                    value="<?php echo isset($_POST['category_name']) ? htmlspecialchars($_POST['category_name']) : htmlspecialchars($category['category_name']); ?>"
-                    oninput="updateCharCount()"
-                >
+<div class="main-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="system-title">Feedback System</div>
+        <nav class="nav-menu">
+            <a href="../admin/admin_dashboard.php" class="nav-item">Dashboard</a>
+            <a href="../admin/manage_users.php" class="nav-item">Manage Users</a>
+            <a href="manage_category.php" class="nav-item active">Manage Categories</a>
+            <a href="../admin/manage_tags.php" class="nav-item">Manage Tags</a>
+            <a href="../admin/analytics_dashboard.php" class="nav-item">Analytics</a>
+            <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+            <a href="../feedback/export_feedback.php" class="nav-item">Export Feedback</a>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="content-area">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="welcome-text">Welcome, Admin <?php echo htmlspecialchars($_SESSION['name']); ?></div>
+            <div class="header-buttons">
+                <a href="../user/profile.php" class="btn-header">Profile</a>
+                <a href="../user/logout.php" class="logout-btn">Logout</a>
             </div>
-            <div class="char-count">
-                <span id="charCount">0</span> / 100 characters
+        </header>
+
+        <!-- Dashboard Content -->
+        <main class="dashboard-content">
+            <div class="container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1>Edit Category</h1>
+                    <p>Update category information</p>
+                </div>
+
+                <!-- Back Button -->
+                <a href="manage_category.php" class="button btn-back">← Back to Manage Categories</a>
+
+                <!-- Messages -->
+                <?php if (isset($error_message)): ?>
+                    <div class="message error">✗ <?php echo htmlspecialchars($error_message); ?></div>
+                <?php endif; ?>
+
+                <!-- Category Information -->
+                <div class="info-box">
+                    <h4>Category Information</h4>
+                    <div class="info-item">
+                        <span>Category ID:</span>
+                        <span>#<?php echo htmlspecialchars($category['category_id']); ?></span>
+                    </div>
+                    <div class="info-item">
+                        <span>Current Name:</span>
+                        <span><?php echo htmlspecialchars($category['category_name']); ?></span>
+                    </div>
+                    <div class="info-item">
+                        <span>Feedback Count:</span>
+                        <span class="badge"><?php echo $category['feedback_count']; ?> feedback(s)</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Created At:</span>
+                        <span><?php echo date('M d, Y', strtotime($category['created_at'])); ?></span>
+                    </div>
+                </div>
+                
+                <!-- Warning if category has feedback -->
+                <?php if ($category['feedback_count'] > 0): ?>
+                <div class="warning-box">
+                    <div class="warning-icon">⚠</div>
+                    <div class="warning-content">
+                        <strong>Warning:</strong> This category has <strong><?php echo $category['feedback_count']; ?></strong> feedback(s) associated with it. Changing the name will affect all related feedback entries.
+                    </div>
+                </div>
+                <?php endif; ?>
+
+                <!-- Edit Form -->
+                <div class="form-card">
+                    <h3>Update Category Details</h3>
+                    <form method="POST" action="" id="categoryForm">
+                        <div class="form-group">
+                            <label for="category_name">Category Name <span class="required">*</span></label>
+                            <input 
+                                type="text" 
+                                id="category_name" 
+                                name="category_name" 
+                                required
+                                minlength="3"
+                                maxlength="100"
+                                placeholder="Enter category name"
+                                value="<?php echo isset($_POST['category_name']) ? htmlspecialchars($_POST['category_name']) : htmlspecialchars($category['category_name']); ?>"
+                                oninput="updateCharCount()"
+                            >
+                            <div class="char-count">
+                                <span id="charCount">0</span> / 100 characters
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary">Save Changes</button>
+                    </form>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="button-group">
+                    <a href="delete_category.php?id=<?php echo $category['category_id']; ?>" 
+                       class="btn-danger"
+                       onclick="return confirm('Are you sure you want to delete this category? This action cannot be undone and may affect existing feedback.')">
+                        Delete Category
+                    </a>
+                    <a href="manage_category.php" class="btn-secondary">Cancel & Go Back</a>
+                </div>
             </div>
-        </div>
-        
-        <div class="button-group">
-            <a href="manage_category.php" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-primary">💾 Save Changes</button>
-        </div>
-    </form>
+        </main>
+    </div>
 </div>
 
 <script>

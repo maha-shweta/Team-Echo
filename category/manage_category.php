@@ -55,7 +55,7 @@ $username = isset($_SESSION['name']) ? $_SESSION['name'] : 'Admin';
             <a href="manage_category.php" class="nav-item active">Manage Categories</a>
             <a href="../admin/manage_tags.php" class="nav-item">Manage Tags</a>
             <a href="../admin/analytics_dashboard.php" class="nav-item">Analytics</a>
-            <a href="../dashboard/ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
+            <a href="ai_analytics_dashboard.php" class="nav-item">Team-Echo AI</a>
             <a href="../feedback/export_feedback.php" class="nav-item">Export Feedback</a>
         </nav>
     </aside>
@@ -75,14 +75,14 @@ $username = isset($_SESSION['name']) ? $_SESSION['name'] : 'Admin';
 
         <!-- Dashboard Content -->
         <main class="dashboard-content">
-            <!-- Back Button -->
-            <a href="../admin/admin_dashboard.php" class="button btn-back">← Back to Dashboard</a>
-
             <!-- Page Header -->
             <div class="page-header">
                 <h1>Category Management</h1>
                 <p>Manage feedback categories for your anonymous feedback system</p>
             </div>
+
+            <!-- Back Button -->
+            <a href="../admin/admin_dashboard.php" class="button btn-back">← Back to Dashboard</a>
 
             <!-- Messages -->
             <?php
